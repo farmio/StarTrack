@@ -13,42 +13,38 @@ sensor_buffer = {
 }
 direction_buffer = 0
 
+def rotation_callback(direction):
+    global rotation_count
 
-def rotation_callback(status, sensor_location):
+    rotation_count += direction
+    print 'rotation_count: %r'%rotation_count
+
+def sensor_callback(status, sensor_location):
     print('callback on sensor %r'%sensor_location)
     print('callback: %r'%status)
 
-    global rotation_count
     global direction_buffer
 
     sensor_buffer[sensor_location] = status
 
     if sensor_buffer[1] == sensor_buffer[2]:
         if sensor_location == 1:
-            print 'right'
-            direction_buffer -= 1
+            direction_buffer -= 1   #right
         elif sensor_location == 2:
-            print 'left'
-            direction_buffer += 1
+            direction_buffer += 1   #left
     else:
         if sensor_location == 1:
-            print 'left'
-            direction_buffer += 1
+            direction_buffer += 1   #left
         elif sensor_location == 2:
-            print 'right'
-            direction_buffer -= 1
+            direction_buffer -= 1   #right
 
     if not(sensor_buffer[1] or sensor_buffer[2]):
-        print 'sensoren frei!'
         if direction_buffer >= 3: #should be == 4; somtimes bouncing problems
-            print '1/38 Runde nach links'
-            rotation_count -= 1
+            rotation_callback(-1)   #left
         elif direction_buffer <= -3: #should be == -4; same as above
-            print '1/38 Runde nach rechts'
-            rotation_count += 1
-        print direction_buffer
+            rotation_callback(1)    #right
+        print 'direction_buffer was: %r'%direction_buffer
         direction_buffer = 0
-        print rotation_count
 
 
 class Sensor:
@@ -87,19 +83,8 @@ class Sensor:
             return GPIO.input(self.pin)
 
     def callback(self, pin):
-        rotation_callback(self.read_sensor(), self.sensor_location)
+        sensor_callback(self.read_sensor(), self.sensor_location)
 
 
 sensor_one = Sensor(rot_sensors['front'], 1)
 sensor_two = Sensor(rot_sensors['rear'], 2)
-
-
-try:
-    print 'Waiting for Interrupt'
-    while 1:
-        pass
-        
-except KeyboardInterrupt:
-    GPIO.cleanup()
-
-GPIO.cleanup()
