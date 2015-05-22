@@ -1,9 +1,14 @@
-import time
-import math
-
 import Adafruit_CharLCD as AdaLCD
 
 from config import lcd
+
+
+def update(self, data):
+    self.clear()
+    self.set_cursor(0, 0)
+    self.message(str(data))
+
+AdaLCD.Adafruit_CharLCD.update = update
 
 display = AdaLCD.Adafruit_CharLCD(lcd['rs'],
                                   lcd['en'],
@@ -14,7 +19,3 @@ display = AdaLCD.Adafruit_CharLCD(lcd['rs'],
                                   lcd['columns'],
                                   lcd['rows']
                                   )
-
-#display.message('Hello world! ')
-#display.set_cursor(0, 1)
-#display.message('at 0, 1 now')

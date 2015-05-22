@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 
 from config import rot_sensors
 
-__all__ = ['rotation_count']  #only this can be exported using *
+#__all__ = ['rotation_count']  #only this can be exported using *
 
 GPIO.setmode(GPIO.BCM)
 
@@ -40,11 +40,14 @@ def sensor_callback(status, sensor_location):
 
     if not(sensor_buffer[1] or sensor_buffer[2]):
         if direction_buffer >= 3: #should be == 4; somtimes bouncing problems
+            direction_buffer = 0
             rotation_callback(-1)   #left
         elif direction_buffer <= -3: #should be == -4; same as above
+            direction_buffer = 0
             rotation_callback(1)    #right
-        print 'direction_buffer was: %r'%direction_buffer
-        direction_buffer = 0
+        else:
+            print 'direction_buffer was: %r'%direction_buffer
+            direction_buffer = 0
 
 
 class Sensor:

@@ -36,6 +36,30 @@ My hardware:
 - 1x Bauer Rainstar (90-400 ? from ~1985)
 - 1x RaspberryPi Model B (512 MB Ram)
 - 2x Inductive proximity sensor Omron E2B-M12KS04-WP-B2 2M
+- 1x 3G Stick Huawei E156G
+
+##Dependencies
+
+###Operating system
+
+I'm running Debian Wheezy (Raspbian image from 05.05.2015). Additional packages installed:
+
+- git
+- python-pip
+- python-dev
+- build-essential
+
+For 3G connectivity:
+
+- ppp
+- wvdial
+- sakis3g: http://www.sakis3g.com/ - copy to /usr/bin/
+
+###Python modules
+
+- Adafruit_CharLCD: https://github.com/adafruit/Adafruit_Python_CharLCD
+- RPi.GPIO (comes with Raspbian)
+
 
 ##Licence
 
