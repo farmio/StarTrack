@@ -2,13 +2,11 @@ from math import pi
 
 from config import reel
 
-def get_distance(rotation_count):
-    distance = 0
 
 class Hose:
     def __init__(self):
-        #layer inner layer: max_layers -1; outer layer: 0
-        #layer_hr inner layer: 1; outer layer: max_layers
+        #layer: inner layer = max_layers -1; outer layer = 0
+        #layer_hr: inner layer = 1; outer layer = max_layers
         self.layer_signals = []
         self.sum_signals = []
         self.layer_radius = []
@@ -69,4 +67,4 @@ class Hose:
 
 hose = Hose()
 print hose.sum_signals
-print hose.length_remaining(hose.sum_signals[reel['max_layers']-1])
+print 'Max length: ', hose.length_remaining(hose.sum_signals[reel['max_layers']-1])

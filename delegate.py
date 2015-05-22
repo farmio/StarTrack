@@ -20,7 +20,7 @@ class delegate(object):
             self.callbacks.append(func)
         return func
 
-    def callback_async(self, func):
+    def callback_async(self, func): #this is my own contribution
         if callable(func):
             self.__isub__(func)
             self.callbacks.append(lambda x:

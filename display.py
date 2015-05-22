@@ -1,15 +1,12 @@
-import time
-import math
-
 import Adafruit_CharLCD as AdaLCD
 
 from config import lcd
+
 
 def update(self, data):
     self.clear()
     self.set_cursor(0, 0)
     self.message(str(data))
-
 
 AdaLCD.Adafruit_CharLCD.update = update
 

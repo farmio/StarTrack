@@ -3,7 +3,7 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 import position
-import distance
+from distance import hose
 from delegate import delegate
 from display import display
 
