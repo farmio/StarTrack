@@ -14,6 +14,10 @@ position.rotation_callback = delegate(position.rotation_callback)
 def update_display():
     display.update(position.rotation_count)
 
+#@position.rotation_callback.callback_async
+#def update_display():
+#    display.update()
+
 try:
     print 'Waiting for Interrupt'
     while 1:

@@ -2,14 +2,17 @@
 
 monitor old Rainstars
 
+
 ##Disclaimer
 
 This is my very first Python project and my first project on GitHub.
 I'm trying to advance in both as this project progresses.
 
+
 ##Description
 
 Monitoring of piston driven reel irrigation systems (eg. Bauer Rainstar 1975-1995) with a RaspberryPi
+
 
 ##Goals
 
@@ -29,6 +32,7 @@ Hardware
   - [ ] with generator driven by the exhausted water from the piston drive
 - [ ] regulate retraction speed
 
+
 ##Hardware
 
 My hardware:
@@ -36,7 +40,9 @@ My hardware:
 - 1x Bauer Rainstar (90-400 ? from ~1985)
 - 1x RaspberryPi Model B (512 MB Ram)
 - 2x Inductive proximity sensor Omron E2B-M12KS04-WP-B2 2M
+- 1x HD44780 compatible 20x4 character LCD
 - 1x 3G Stick Huawei E156G
+
 
 ##Dependencies
 
@@ -55,10 +61,12 @@ For 3G connectivity:
 - wvdial
 - sakis3g: http://www.sakis3g.com/ - copy to /usr/bin/
 
+
 ###Python modules
 
 - Adafruit_CharLCD: https://github.com/adafruit/Adafruit_Python_CharLCD
 - RPi.GPIO (comes with Raspbian)
+- subprocess32
 
 
 ##Licence

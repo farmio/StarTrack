@@ -53,3 +53,22 @@ lcd = {
     'd6': 10,
     'd7': 11,
 }
+
+#network preferences
+net = {
+    #sakis3g preferences
+    'sakis3g': {
+        'arguments': [
+            'MODEM=OTHER',
+            'OTHER=USBMODEM',
+            'USBDRIVER=option',
+            #usb id found via lsusb
+            'USBMODEM=12d1:1003',
+            'APN=CUSTOM_APN',
+            'CUSTOM_APN=drei.at',
+            #if no user/password is needed use 0
+            'APN_USER=0',
+            'APN_PASS=0'
+        ]
+    }
+}

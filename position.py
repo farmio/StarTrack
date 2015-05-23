@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 
 from config import rot_sensors
 
-#__all__ = ['rotation_count']  #only this can be exported using *
 
 GPIO.setmode(GPIO.BCM)
 
