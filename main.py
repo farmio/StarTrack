@@ -4,19 +4,21 @@ from threading import Lock
 import RPi.GPIO as GPIO
 
 from position import Sensor
-from distance import hose
+from distance import Hose
 from delegate import Delegate
 from delegate import Queue
 from display import Display
+from status import Status
 
-
-display = Display(Sensor)
+hose = Hose()
+status = Status(Sensor, hose)
+display = Display(status)
 
 #set delegates
 Sensor.rotation_callback = Delegate(Sensor.rotation_callback)
 Sensor.sensor_callback = Delegate(Sensor.sensor_callback)
 
-#initialise threads
+#initialise thread locks
 display_thread = Lock()
 
 @Sensor.rotation_callback.callback

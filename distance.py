@@ -63,8 +63,3 @@ class Hose:
         else:
             length += (rotation_count * self.length_per_signal[i])
         return length
-
-
-hose = Hose()
-print hose.sum_signals
-print 'Max length: ', hose.length_remaining(hose.sum_signals[reel['max_layers']-1])

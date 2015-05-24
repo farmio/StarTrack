@@ -10,10 +10,12 @@ class Sensor:
         2: False
     }
     direction_buffer = 0
+    last_direction = 0
 
     @classmethod
     def rotation_callback(cls, direction):
         cls.rotation_count += direction
+        cls.last_direction = direction
         print 'rotation_count: %r'%cls.rotation_count
 
     @classmethod
