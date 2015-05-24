@@ -3,7 +3,7 @@ rot_sensors = {
     ##front sensor
     'front': {
         #GPIO.BCM style pin numeration
-        'pin': 23, # 23 -> Pin16
+        'pin': 24, # 24 -> Pin18
         #sensor contact type - valid are: 'nc' for normally closed type,
         #'no' for normally open  - defaults to 'no'
         'sensor_type': 'no',
@@ -13,7 +13,7 @@ rot_sensors = {
     ##rear sensor
     'rear': {
         #GPIO.BCM style pin numeration
-        'pin': 24, # 24 -> Pin18
+        'pin': 23, # 23 -> Pin17
         #sensor contact type - valid are: 'nc' for normally closed type,
         #'no' for normally open - defaults to 'no'
         'sensor_type': 'no',

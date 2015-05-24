@@ -1,8 +1,8 @@
 import threading
+from time import sleep
 
 #thanks to kindall on stackoverflow.com
-
-class delegate(object):
+class Delegate(object):
 
     def __init__(self, func):
         self.callbacks = []
@@ -20,13 +20,6 @@ class delegate(object):
             self.callbacks.append(func)
         return func
 
-    def callback_async(self, func): #this is my own contribution
-        if callable(func):
-            self.__isub__(func)
-            self.callbacks.append(lambda x:
-                threading.Thread(target=func).start()
-                )
-
     def __isub__(self, func):
         try:
             self.callbacks.remove(func)
@@ -40,3 +33,20 @@ class delegate(object):
             newresult = func(result)
             result = result if newresult is None else newresult
         return result
+
+
+class Queue(threading.Thread):
+    def __init__(self, func, q, rest=0):
+        threading.Thread.__init__(self)
+        if callable(func):          #this isn't good
+            self.func = func
+            self.queue = q
+            self.rest = rest
+        else:
+            print 'Queue needs function and threading.Lock() instance'
+
+    def run(self):
+        self.queue.acquire()
+        self.func()
+        sleep(self.rest)
+        self.queue.release()
