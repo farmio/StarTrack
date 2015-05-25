@@ -1,7 +1,5 @@
 import RPi.GPIO as GPIO
 
-from config import rot_sensors
-
 
 class Sensor:
     rotation_count = 0
@@ -10,10 +8,12 @@ class Sensor:
         2: False
     }
     direction_buffer = 0
+    last_direction = 0
 
     @classmethod
     def rotation_callback(cls, direction):
         cls.rotation_count += direction
+        cls.last_direction = direction
         print 'rotation_count: %r'%cls.rotation_count
 
     @classmethod
@@ -82,7 +82,3 @@ class Sensor:
 
     def callback(self, pin):
         Sensor.sensor_callback(self.read_sensor(), self.sensor_location)
-
-#Sensors need 2nd argument 1 or 2
-sensor_one = Sensor(rot_sensors['front'], 1)
-sensor_two = Sensor(rot_sensors['rear'], 2)
