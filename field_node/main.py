@@ -4,12 +4,12 @@ from threading import Lock
 import RPi.GPIO as GPIO
 
 import config
-from position import Sensor
-from distance import Hose
-from delegate import Delegate
-from delegate import Queue
-from display import Display
-from status import Status
+from modules import Sensor
+from modules import Hose
+from modules import Delegate
+from modules import Queue
+from modules import Display
+from modules import Status
 
 #Sensors need 2nd argument 1 or 2
 sensor_one = Sensor(config.rot_sensors['front'], 1)
