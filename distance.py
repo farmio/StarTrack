@@ -1,10 +1,9 @@
 from math import pi
 
-from config import reel
-
 
 class Hose:
-    def __init__(self):
+    def __init__(self, reel):
+        self.reel = reel
         #layer: inner layer = max_layers -1; outer layer = 0
         #layer_hr: inner layer = 1; outer layer = max_layers
         self.layer_signals = []
@@ -50,7 +49,7 @@ class Hose:
             return i
 
     def layer_hr(self, rotation_count): # _hr -> human readable
-        return reel['max_layers'] - self.current(rotation_count)
+        return self.reel['max_layers'] - self.current(rotation_count)
 
     def length_remaining(self, rotation_count):
         length = 0
