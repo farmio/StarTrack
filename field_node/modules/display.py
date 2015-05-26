@@ -33,10 +33,12 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.message_buffer.append( (8, 1, 'm') )
         self.message_buffer.append( (0, 2, 'L:') )
         self.message_buffer.append( (4, 2, '|') )
-        self.message_buffer.append( (17, 1, 'm/h'))
+        self.message_buffer.append( (17, 1, 'm/h') )
+        self.message_buffer.append( (12, 2, 'T-') )
         self.speed()
         self.layer()
         self.row()
+        self.time_remaining()
         self.clock()
         self.update()
 
@@ -50,6 +52,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.speed()
         self.row()
         self.layer()
+        self.time_remaining()
         self.message_buffer.append( (2, 0, str(rot_count).rjust(5)) )
         if rot_dir > 0:
             self.message_buffer.append( (8, 0, '<') )
@@ -82,10 +85,14 @@ class Display(AdaLCD.Adafruit_CharLCD):
     def row(self):
         self.message_buffer.append( (5, 2, str(self.source.row()).ljust(2)) )
 
+    def time_remaining(self):
+        timer = self.source.time_remaining_str()
+        self.message_buffer.append( (14, 2, timer.rjust(6)) )
+
 #display segmentation
 #0##3##6##9##2##5##8##
 #S:-1234 <--> ti:me Y#0
 #l:-400.1m  100.3 m/h#1
-#L:10|11             #2
+#L:10|11     T-112:34#2
 #                    #3
 ######################
