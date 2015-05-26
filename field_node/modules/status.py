@@ -3,9 +3,10 @@ from datetime import datetime
 
 
 class Status:
-    def __init__(self, position_source, distance_source):
+    def __init__(self, position_source, distance_source, pace_source):
         self.position = position_source
         self.distance = distance_source
+        self.pace = pace_source
 
     def length_remaining_m(self):
         meters = round(
@@ -25,3 +26,22 @@ class Status:
 
     def time_str(self):
         return time.strftime('%H:%M')
+
+    def speed_last_mh(self, x):
+        return (round( self.speed_last(x) * 36 , 1))
+
+    def speed_last(self, x):    #in cm/sek
+        try:
+            return ( self.distance.length(self.position.rotation_count,
+                                                offset=x) /
+                           (self.pace.average_pace(offset=x) * x) )
+        except ZeroDivisionError:
+            return 0
+
+    def layer(self, rot=None):
+        if not(rot): rot=self.position.rotation_count
+        return self.distance.layer_hr(rot)
+
+    def row(self, rot=None):    #int
+        if not(rot): rot=self.position.rotation_count
+        return self.distance.row(rot)

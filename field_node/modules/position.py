@@ -14,12 +14,13 @@ class Sensor:
     def rotation_callback(cls, direction):
         cls.rotation_count += direction
         cls.last_direction = direction
-        print 'rotation_count: %r'%cls.rotation_count
+        return direction
+        #print 'rotation_count: %r'%cls.rotation_count
 
     @classmethod
     def sensor_callback(cls, status, sensor_location):
-        print('callback on sensor %r'%sensor_location)
-        print('callback: %r'%status)
+        #print('callback on sensor %r'%sensor_location)
+        #print('callback: %r'%status)
 
         cls.sensor_buffer[sensor_location] = status
 
@@ -42,7 +43,7 @@ class Sensor:
                 cls.direction_buffer = 0
                 cls.rotation_callback(1)    #right
             else:
-                print 'direction_buffer was: %r'%cls.direction_buffer
+                #print 'direction_buffer was: %r'%cls.direction_buffer
                 cls.direction_buffer = 0
 
     def __init__(self, sensor_preferences, sensor_location):
