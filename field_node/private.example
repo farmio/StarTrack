@@ -1,0 +1,15 @@
+#rename this file to 'private.py'
+adn = {
+    'access_token': 'YOUR_ADN_ACCESS_TOKEN',
+    'recipient': '@example' #app.net user id or @NAME
+}
+
+email = {
+    'recipient': 'destination@example.com',
+    'smtp_server': 'smtp-mail.outlook.com',
+    'smtp_port': 587,
+    'login': 'yourEmail@example.com',
+    'password': 'YOURsuperSECRETpassword,
+    'from_name': 'StarTrack', #whatever you want
+    'from_email': 'yourEmail@example.com', #your email address - usally the same as login
+}
