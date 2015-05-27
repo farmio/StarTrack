@@ -11,17 +11,17 @@ class Sakis3g:
     def connect():
         try:
             output = check_output(connect_call)
-            print 'output : ', output
+            print('output : ', output)
         except CalledProcessError:
-            print 'output error : ', output
+            print('output error : ', output)
 
     @staticmethod
     def disconnect():
         try:
             output = check_output(disconnect_call)
-            print 'output : ', output
+            print('output : ', output)
         except CalledProcessError:
-            print 'output error : ', output
+            print('output error : ', output)
 
 
 class Network:

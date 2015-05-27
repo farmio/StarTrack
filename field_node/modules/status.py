@@ -37,8 +37,8 @@ class Status:
             return 0
 
     def time_remaining_str(self, offset=3):
-        ti = int(self.time_remaining(offset)) / 60
-        hours = ti / 60
+        ti = int(self.time_remaining(offset)) // 60
+        hours = ti // 60
         if hours > 999:
             return '++:++'
         minutes = ti % 60

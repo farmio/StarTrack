@@ -51,8 +51,9 @@ My hardware:
 I'm running Debian Wheezy (Raspbian image from 05.05.2015). Additional packages installed:
 
 - git
-- python-pip
-- python-dev
+- python-pip (python3-pip)
+- python-dev (python3-dev)
+- python-smbus (python3-smbus) req. for Adafruit_CharLCD
 - build-essential
 
 For 3G connectivity:
@@ -64,7 +65,7 @@ For 3G connectivity:
 
 ###Python modules
 
-- Adafruit_CharLCD: https://github.com/adafruit/Adafruit_Python_CharLCD
+- Adafruit_CharLCD: Original: https://github.com/adafruit/Adafruit_Python_CharLCD / Python3: https://github.com/matthw/Adafruit_Python_CharLCD
 - RPi.GPIO (comes with Raspbian)
 - subprocess32
 

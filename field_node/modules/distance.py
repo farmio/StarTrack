@@ -44,9 +44,9 @@ class Hose:
             self.length_per_signal.append(
                 get_length_per_signal(self.layer_radius[i]))
 
-        print 'cm / signal [layer]:  ', self.length_per_signal
-        print 'signal/layer [layer]: ', self.layer_signals
-        #print 'row / layer [layer]:  ', self.rows_per_layer
+        print('cm / signal [layer]:  ', self.length_per_signal)
+        print('signal/layer [layer]: ', self.layer_signals)
+        #print('row / layer [layer]:  ', self.rows_per_layer)
 
     def layer(self, rotation_count):
         i = 0
@@ -77,4 +77,4 @@ class Hose:
     def row(self, rotation_count):
         layer = self.layer(rotation_count)
         count_in_layer = self.sum_signals[layer] - rotation_count
-        return count_in_layer / self.reel['sensor_targets']
+        return count_in_layer // self.reel['sensor_targets']

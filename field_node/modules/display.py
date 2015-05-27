@@ -21,7 +21,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
 
     def update(self):
         for m in sorted(self.message_buffer, key=itemgetter(1,0)):
-            #print m
+            #print(m)
             self.set_cursor(m[0], m[1])
             self.message(m[2])
         self.message_buffer = []
@@ -53,6 +53,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.row()
         self.layer()
         self.time_remaining()
+        self.clock()
         self.message_buffer.append( (2, 0, str(rot_count).rjust(5)) )
         if rot_dir > 0:
             self.message_buffer.append( (8, 0, '<') )

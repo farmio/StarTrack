@@ -4,6 +4,7 @@ from threading import Lock
 import RPi.GPIO as GPIO
 
 import config
+import private              #for access-tokens / mail-configuration
 from modules import Sensor
 from modules import Hose
 from modules import Delegate
@@ -46,7 +47,7 @@ def display_sensor(*args, **kwargs):
           rest=0.01).start()
 
 try:
-    print 'Waiting for Interrupt'
+    print('Waiting for Interrupt')
     while 1:
         pass
 except KeyboardInterrupt:

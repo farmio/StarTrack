@@ -39,4 +39,4 @@ if __name__ == "__main__":
     for i in range(500):
         time.sleep(0.001)
         s.callback(1)
-    print s.average_pace(offset=1200)
+    print(s.average_pace(offset=1200))
