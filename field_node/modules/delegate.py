@@ -43,7 +43,7 @@ class Queue(threading.Thread):
             self.queue = q
             self.rest = rest
         else:
-            print 'Queue needs function and threading.Lock() instance'
+            print('Queue needs function and threading.Lock() instance')
 
     def run(self):
         self.queue.acquire()

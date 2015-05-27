@@ -31,7 +31,7 @@ reel = {
     #windings per layer
     'windings_max': 17,
     #windings outer layer
-    'windings_outer_layer': 15,
+    'windings_outer_layer': 1,
     #dimensions in cm
     'hose_diameter': 8.5,
     #radius of the reel without hose
