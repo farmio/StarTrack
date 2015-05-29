@@ -11,7 +11,7 @@ class Adn:
     def __init__(self, credentials):
         self.access_token = credentials['access_token']
         self.default_recipient = credentials['recipient']
-        adnpy.api.add_authorization_token(private.adn[self.access_token])
+        adnpy.api.add_authorization_token(self.access_token)
 
     def pm(self, text, recipient=None):
         if not(recipient): recipient = self.default_recipient
