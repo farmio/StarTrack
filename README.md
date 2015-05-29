@@ -5,7 +5,7 @@ monitor old Rainstars
 
 ##Disclaimer
 
-This is my very first Python project and my first project on GitHub.
+This is my very first Python project and my first project with git.
 I'm trying to advance in both as this project progresses.
 
 
@@ -18,18 +18,19 @@ Monitoring of piston driven reel irrigation systems (eg. Bauer Rainstar 1975-199
 
 Software
 
-- [ ] measure the current retraction speed
-  - [ ] calculate the remaining irrigation time
-  - [ ] calculate current water / area
+- [x] measure the current retraction speed
+  - [x] calculate the remaining irrigation time
+  - [ ] calculate water/area at current speed
 - [ ] communicate over 3G
   - [ ] alert when retraction is finished / has stopped
   - [ ] post status to a server (every half hour ?)
+- [ ] possibility for setting remaining length manually
 
 Hardware
 
 - [ ] load battery
   - [ ] with photovoltaic cell
-  - [ ] with generator driven by the exhausted water from the piston drive
+  - [ ] with generator driven by water from the piston drive
 - [ ] regulate retraction speed
 
 
@@ -67,7 +68,9 @@ For 3G connectivity:
 
 - Adafruit_CharLCD: Original: https://github.com/adafruit/Adafruit_Python_CharLCD / Python3: https://github.com/matthw/Adafruit_Python_CharLCD
 - RPi.GPIO (comes with Raspbian)
-- subprocess32
+- subprocess32 (Python2 - for Python3: subprocess)
+- requests
+- adnpy (Python 2 only)
 
 
 ##Licence
