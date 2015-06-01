@@ -3,13 +3,43 @@ from datetime import datetime
 
 
 class Status:
-    def __init__(self, position_source, distance_source, pace_source):
-        self.position = position_source
+    def __init__(self, distance_source, pace_source):
         self.distance = distance_source
         self.pace = pace_source
+        self.rotation_count = 0
+        self.sensors = (0, 0)
+        self.rotation_direction = 0
+        self.current_layer = self.layer()
+        self.current_row = self.row()
+
+    def sensor_update(self, sensor_tuple):
+        self.sensors = sensor_tuple
+        return(sensor_tuple)
+
+    def rotation_update(self, direction):
+        self.rotation_count += direction
+        self.rotation_direction = direction
+        self.pace.callback(direction)
+
+        _layer = self.current_layer
+        self.current_layer = self.layer()
+        if self.current_layer != _layer:
+            self.layer_update(_layer)
+
+        _row = self.current_row
+        self.current_row = self.row()
+        if self.current_row != _row:
+            self.row_update(_row)
+        return(self.rotation_count)
+
+    def layer_update(self, last):
+        print('layer_update')
+
+    def row_update(self, last):
+        print('row_update')
 
     def length_remaining(self):
-        return(self.distance.length_remaining(self.position.rotation_count))
+        return(self.distance.length_remaining(self.rotation_count))
 
     def length_remaining_m(self):
         meters = round(
@@ -17,15 +47,6 @@ class Status:
             100.0,
             1)
         return meters
-
-    def rotation_count(self):
-        return self.position.rotation_count
-
-    def sensors(self):
-        return self.position.sensor_buffer
-
-    def rotation_direction(self):
-        return self.position.last_direction
 
     def time_str(self):
         return time.strftime('%H:%M')
@@ -49,16 +70,16 @@ class Status:
 
     def speed_last(self, x):    #in cm/sek
         try:
-            return ( self.distance.length(self.position.rotation_count,
+            return ( self.distance.length(self.rotation_count,
                                                 offset=x) /
                            (self.pace.average_pace(offset=x) * x) )
         except ZeroDivisionError:
             return 0
 
     def layer(self, rot=None):
-        if not(rot): rot=self.position.rotation_count
+        if not(rot): rot=self.rotation_count
         return self.distance.layer_hr(rot)
 
     def row(self, rot=None):    #int
-        if not(rot): rot=self.position.rotation_count
+        if not(rot): rot=self.rotation_count
         return self.distance.row(rot)

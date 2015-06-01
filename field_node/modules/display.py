@@ -20,6 +20,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.init_display()
 
     def update(self):
+        """ Sort message_buffer and send to display. """
         for m in sorted(self.message_buffer, key=itemgetter(1,0)):
             #print(m)
             self.set_cursor(m[0], m[1])
@@ -47,11 +48,11 @@ class Display(AdaLCD.Adafruit_CharLCD):
         #self.update()
 
     def rotation_update(self):           #display 2:7, 0; 2:8, 1
-        rot_count = self.source.rotation_count()
-        rot_dir = self.source.rotation_direction()
+        rot_count = self.source.rotation_count
+        rot_dir = self.source.rotation_direction
         self.speed()
-        self.row()
-        self.layer()
+        #self.row()
+        #self.layer()
         self.time_remaining()
         self.clock()
         self.message_buffer.append( (2, 0, str(rot_count).rjust(5)) )
@@ -66,10 +67,10 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.update()
 
     def sensor_update(self):    #display 8:11, 0
-        sensors = self.source.sensors()
+        sensors = self.source.sensors
         sensor_message = ''
         for i in sensors:
-            sensor_message += '_' if sensors[i] else '-'
+            sensor_message += '_' if i else '-'
         self.message_buffer.append( (9, 0, (str(sensor_message).ljust(2))) )
         self.update()
 

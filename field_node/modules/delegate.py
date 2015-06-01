@@ -30,23 +30,24 @@ class Delegate(object):
     def __call__(self, *args, **kwargs):
         result = self.basefunc(*args, **kwargs)
         for func in self.callbacks:
+            print('args: ', args)
             newresult = func(result)
             result = result if newresult is None else newresult
         return result
 
 
 class Queue(threading.Thread):
-    def __init__(self, func, q, rest=0):
+    def __init__(self, func, q, pause=0):
         threading.Thread.__init__(self)
-        if callable(func):          #this isn't good
+        if callable(func):
             self.func = func
             self.queue = q
-            self.rest = rest
+            self.pause = pause
         else:
             print('Queue needs function and threading.Lock() instance')
 
     def run(self):
         self.queue.acquire()
         self.func()
-        sleep(self.rest)
+        sleep(self.pause)
         self.queue.release()

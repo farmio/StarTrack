@@ -1,18 +1,15 @@
 from math import pi
 
 
-class Hose:
+class Distance:
     def __init__(self, reel):
         self.reel = reel
-        #layer: inner layer = max_layers -1; outer layer = 0
-        #layer_hr: inner layer = 1; outer layer = max_layers
         self.layer_signals = []
         self.sum_signals = []
         self.layer_radius = []
         self.length_per_signal = []
-        #self.rows_per_layer = []
-        hose_pull_point = round(float(reel['hose_diameter']) / 3,
-                                1)
+
+        hose_pull_point = round(float(reel['hose_diameter']) / 3, 1)
 
         def get_layer_signals(layer):
             if layer == 0:
@@ -49,6 +46,7 @@ class Hose:
         #print('row / layer [layer]:  ', self.rows_per_layer)
 
     def layer(self, rotation_count):
+        """ Returns current layer. 0 is outer layer. """
         i = 0
         while rotation_count > self.sum_signals[i]:
             i += 1
@@ -56,13 +54,16 @@ class Hose:
             return i
 
     def layer_hr(self, rotation_count): # _hr -> human readable
+        """ Takes rotation_count, returns layer. 1 is inner. """
         return self.reel['max_layers'] - self.layer(rotation_count)
 
     def length(self, rotation_count, offset=0):
+        """ Returns distance between rotation_count and offset in cm """
         return ( self.length_remaining(rotation_count) -
                  self.length_remaining(rotation_count-offset) )
 
     def length_remaining(self, rotation_count):
+        """ Takes rotation_count and returns distance to 0 in cm. """
         length = 0
         i = 0
         while rotation_count > self.layer_signals[i]:
@@ -75,6 +76,7 @@ class Hose:
         return length
 
     def row(self, rotation_count):
+        """ Takes rotation_count returns row starting at 0. """
         layer = self.layer(rotation_count)
         count_in_layer = self.sum_signals[layer] - rotation_count
         return count_in_layer // self.reel['sensor_targets']
