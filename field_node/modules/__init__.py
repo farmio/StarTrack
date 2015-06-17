@@ -9,3 +9,4 @@ from .alert import Adn
 from .alert import Alert
 from .rotation import Rotation
 from .rotation import Sensor
+from .spy import Spy

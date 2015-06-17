@@ -17,7 +17,25 @@ class Display(AdaLCD.Adafruit_CharLCD):
         AdaLCD.Adafruit_CharLCD.__init__(self, *lcd_prefs)
         self.source = source
         self.message_buffer = []
+        self.custom_chars()
         self.init_display()
+
+    def custom_chars(self):
+        SYM_LENGTH = [0,0,0,17,31,0,0,0]
+        SYM_LAYER = [8,8,20,20,10,9,4,2]
+        SYM_CLOCK = [0,14,21,23,17,14,0,0]
+        SYM_HOURGLASS = [31,17,10,4,10,17,31,0]
+        SYM_KNOB = [4,4,4,12,12,4,4,4]
+        self.create_char(0, SYM_LENGTH)
+        self.create_char(1, SYM_LAYER)
+        self.create_char(2, SYM_CLOCK)
+        self.create_char(3, SYM_HOURGLASS)
+        self.create_char(4, SYM_KNOB)
+        self.sym_length = '\x00'
+        self.sym_layer = '\x01'
+        self.sym_clock = '\x02'
+        self.sym_hourglass = '\x03'
+        self.sym_knob = '\x04'
 
     def update(self):
         """ Sort message_buffer and send to display. """
@@ -29,13 +47,13 @@ class Display(AdaLCD.Adafruit_CharLCD):
 
     def init_display(self):
         self.clear()
-        self.message_buffer.append( (0, 0, 'S:') )
-        self.message_buffer.append( (0, 1, 'l:') )
+        self.message_buffer.append( (0, 0, self.sym_knob) )
+        self.message_buffer.append( (0, 1, self.sym_length) )
         self.message_buffer.append( (8, 1, 'm') )
-        self.message_buffer.append( (0, 2, 'L:') )
+        self.message_buffer.append( (0, 2, self.sym_layer) )
         self.message_buffer.append( (4, 2, '|') )
         self.message_buffer.append( (17, 1, 'm/h') )
-        self.message_buffer.append( (12, 2, 'T-') )
+        self.message_buffer.append( (12, 2, self.sym_hourglass) )
         self.speed()
         self.layer()
         self.row()
@@ -78,7 +96,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.message_buffer.append( (2, 2, str(self.source.layer()).rjust(2)) )
 
     def speed(self):
-        speed = self.source.speed_last_mh(3)
+        speed = self.source.speed_last_mh(offset=3)
         if speed < 1000:
             self.message_buffer.append( (11, 1, str(speed).rjust(5)) )
         else:

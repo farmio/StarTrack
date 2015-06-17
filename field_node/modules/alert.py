@@ -59,6 +59,7 @@ class Email:
         finally:
             server.quit()
 
+
 class Alert:
     @staticmethod
     def spy(status):

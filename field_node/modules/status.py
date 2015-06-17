@@ -65,8 +65,8 @@ class Status:
         minutes = ti % 60
         return ( str(hours) + ':' + str(minutes).zfill(2) )
 
-    def speed_last_mh(self, x):
-        return (round( self.speed_last(x) * 36 , 1))
+    def speed_last_mh(self, offset=1):
+        return (round( self.speed_last(offset) * 36 , 1))
 
     def speed_last(self, x):    #in cm/sek
         try:

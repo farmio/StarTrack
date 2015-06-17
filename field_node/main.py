@@ -48,20 +48,35 @@ def on_sensor_signal(*args, **kwargs):
     #      display_thread,
     #      pause=0.01).start()
 
-disp_rot = lambda x: Queue(display.rotation_update,
-                                display_thread,
-                                pause=0.01).start()
-def attatch_display():
-    status.rotation_update += disp_rot
-    status.sensor_update += lambda x: Queue(display.sensor_update,
+display_rotation = lambda x: Queue(display.rotation_update,
+                                   display_thread,
+                                   pause=0.01).start()
+
+display_sensors = lambda x: Queue(display.sensor_update,
                                   display_thread,
                                   pause=0.01).start()
+
+def attatch_display():
+    status.rotation_update += display_rotation
+    status.sensor_update += display_sensors
     #status.layer_update += display.layer
+
+def detatch_display():
+    status.rotation_update -= display_rotation
+    status.sensor_update -= display_sensors
 
 attatch_display()
 
-def detatch_display():
-    status.rotation_update -= disp_rot
+def start_monitoring():
+    try:                #not very beautiful
+        spy
+    except NameError:                   #target
+        spy = Spy(status.speed_last_mh, 500, config.monitoring)
+
+def stop_monitoring():
+    del spy     #????????????????????? doesnot touch thread
+
+start_monitoring()
 
 #@Alert.now.callback
 #def network_callback(*args, **kwargs):

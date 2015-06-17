@@ -72,3 +72,14 @@ net = {
         ]
     }
 }
+
+monitoring = {
+    #default target speed
+    'target_speed': 5,
+    #check every seconds
+    'update_time': 3,
+    #alert after seconds
+    'alert_time': 9,
+    #accuracy in percent
+    'accuracy': 20,
+}
