@@ -1,12 +1,14 @@
 from time import sleep
 from threading import Lock
+from config import Config
 
 import RPi.GPIO as GPIO
 
-import config
-import private              #for access-tokens / mail-configuration
 from modules import *
 
+#load config
+f = file('config.cfg')
+cfg = Config(f)
 
 #Sensors need 2nd argument 1 or 2
 sensor_one = Sensor(config.rot_sensors['front'], 1)

@@ -1,8 +1,8 @@
-#from .sensor import Sensor
+#modules
+import ui
 from .distance import Distance
 from .delegate import Delegate
 from .delegate import Queue
-from .display import Display
 from .pace import Pace
 from .status import Status
 from .alert import Adn
