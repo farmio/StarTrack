@@ -4,7 +4,7 @@ from time import sleep
 
 class Delegate(object):
     """ Delegate class enables functions to add and remove callbacks. """
-    #thanks to kindall on stackoverflow.com
+    # thanks to kindall on stackoverflow.com
     def __init__(self, func):
         self.callbacks = []
         self.basefunc = func
@@ -32,7 +32,7 @@ class Delegate(object):
     def __call__(self, *args, **kwargs):
         result = self.basefunc(*args, **kwargs)
         for func in self.callbacks:
-            #print('args: ', args)
+            # print('args: ', args)
             newresult = func(result)
             result = result if newresult is None else newresult
         return result
@@ -58,7 +58,7 @@ class Queue(Thread):
 
 class Timer(Thread):
     """ Resettable timer class. `Timer()` spawns a new thread. """
-    #thanks to James Stroud at code.activestate.com
+    # thanks to James Stroud at code.activestate.com
     def __init__(self, maxtime, expire, step=None, update=None):
         """
         `update(self)` is called every `step` seconds
@@ -70,13 +70,13 @@ class Timer(Thread):
         self.maxtime = maxtime
         self.expire = expire
         if step:
-          self.step = step
+            self.step = step
         else:
-          self.step = maxtime/2
+            self.step = maxtime / 2
         if update:
-          self.update = update
+            self.update = update
         else:
-          self.update = lambda c : None
+            self.update = lambda c: None
         self.counter = 0
         self.active = True
         self.stop = False

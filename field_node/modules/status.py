@@ -66,20 +66,22 @@ class Status:
         return ( str(hours) + ':' + str(minutes).zfill(2) )
 
     def speed_last_mh(self, offset=1):
-        return (round( self.speed_last(offset) * 36 , 1))
+        return (round( self.speed_last(offset) * 36, 1))
 
-    def speed_last(self, x):    #in cm/sek
+    def speed_last(self, x):    # in cm/sek
         try:
             return ( self.distance.length(self.rotation_count,
-                                                offset=x) /
-                           (self.pace.average_pace(offset=x) * x) )
+                                          offset=x) /
+                     (self.pace.average_pace(offset=x) * x) )
         except ZeroDivisionError:
             return 0
 
     def layer(self, rot=None):
-        if not(rot): rot=self.rotation_count
+        if not(rot):
+            rot = self.rotation_count
         return self.distance.layer_hr(rot)
 
-    def row(self, rot=None):    #int
-        if not(rot): rot=self.rotation_count
+    def row(self, rot=None):    # int
+        if not(rot):
+            rot = self.rotation_count
         return self.distance.row(rot)

@@ -16,7 +16,7 @@ class Button(object):
             GPIO.BOTH,
             callback=self._callback,
             bouncetime=bounce
-            )
+        )
         if action:
             self.set_action(action)
 
@@ -53,9 +53,8 @@ class Button_hold(Button):
         self.hold_repeat = hold_repeat / 1000.0
         self.hold_timer = None
 
-
     def _hold(self):
-        if self._listen == True:
+        if self._listen:
             self._action()
             self.repeat_timer = Timer(self.hold_repeat, self._hold)
             self.repeat_timer.start()
@@ -74,14 +73,18 @@ class Button_hold(Button):
 def set_action():
     pass
 
+
 def plus_action():
     print('plus')
+
 
 def minus_action():
     print('minus')
 
+
 def enter_action():
     pass
+
 
 def do_nothing():
     pass

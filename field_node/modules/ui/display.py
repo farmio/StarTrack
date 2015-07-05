@@ -4,7 +4,7 @@ import Adafruit_CharLCD as AdaLCD
 
 
 class Display(AdaLCD.Adafruit_CharLCD):
-    #spawning two threads updating the display simultaniously couses errors
+    # spawning two threads updating the display simultaniously couses errors
     def __init__(self, lcd, source):
         lcd_prefs = [lcd['rs'],
                      lcd['en'],
@@ -21,11 +21,11 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.init_display()
 
     def custom_chars(self):
-        SYM_LENGTH = [0,0,0,17,31,0,0,0]
-        SYM_LAYER = [8,8,20,20,10,9,4,2]
-        SYM_CLOCK = [0,14,21,23,17,14,0,0]
-        SYM_HOURGLASS = [31,17,10,4,10,17,31,0]
-        SYM_KNOB = [4,4,4,12,12,4,4,4]
+        SYM_LENGTH = [0, 0, 0, 17, 31, 0, 0, 0]
+        SYM_LAYER = [8, 8, 20, 20, 10, 9, 4, 2]
+        SYM_CLOCK = [0, 14, 21, 23, 17, 14, 0, 0]
+        SYM_HOURGLASS = [31, 17, 10, 4, 10, 17, 31, 0]
+        SYM_KNOB = [4, 4, 4, 12, 12, 4, 4, 4]
         self.create_char(0, SYM_LENGTH)
         self.create_char(1, SYM_LAYER)
         self.create_char(2, SYM_CLOCK)
@@ -39,8 +39,8 @@ class Display(AdaLCD.Adafruit_CharLCD):
 
     def update(self):
         """ Sort message_buffer and send to display. """
-        for m in sorted(self.message_buffer, key=itemgetter(1,0)):
-            #print(m)
+        for m in sorted(self.message_buffer, key=itemgetter(1, 0)):
+            # print(m)
             self.set_cursor(m[0], m[1])
             self.message(m[2])
         self.message_buffer = []
@@ -63,14 +63,14 @@ class Display(AdaLCD.Adafruit_CharLCD):
 
     def clock(self):
         self.message_buffer.append( (13, 0, self.source.time_str().rjust(5)) )
-        #self.update()
+        # self.update()
 
-    def rotation_update(self):           #display 2:7, 0; 2:8, 1
+    def rotation_update(self):           # display 2:7, 0; 2:8, 1
         rot_count = self.source.rotation_count
         rot_dir = self.source.rotation_direction
         self.speed()
-        #self.row()
-        #self.layer()
+        # self.row()
+        # self.layer()
         self.time_remaining()
         self.clock()
         self.message_buffer.append( (2, 0, str(rot_count).rjust(5)) )
@@ -80,11 +80,11 @@ class Display(AdaLCD.Adafruit_CharLCD):
         elif rot_dir < 0:
             self.message_buffer.append( (8, 0, ' ') )
             self.message_buffer.append( (11, 0, '>') )
-        self.message_buffer.append( (2, 1,
-            str(self.source.length_remaining_m()).rjust(6)) )
+        self.message_buffer.append(
+            (2, 1, str(self.source.length_remaining_m()).rjust(6)) )
         self.update()
 
-    def sensor_update(self):    #display 8:11, 0
+    def sensor_update(self):    # display 8:11, 0
         sensors = self.source.sensors
         sensor_message = ''
         for i in sensors:
@@ -109,10 +109,10 @@ class Display(AdaLCD.Adafruit_CharLCD):
         timer = self.source.time_remaining_str()
         self.message_buffer.append( (14, 2, timer.rjust(6)) )
 
-#display segmentation
-#0##3##6##9##2##5##8##
-#S:-1234 <--> ti:me Y#0
-#l:-400.1m  100.3 m/h#1
-#L:10|11     T-112:34#2
+# display segmentation
+# 0##3##6##9##2##5##8##
+# S:-1234 <--> ti:me Y#0
+# l:-400.1m  100.3 m/h#1
+# L:10|11     T-112:34#2
 #                    #3
-######################
+# #####################
