@@ -15,12 +15,12 @@ def readTemp():
 def sendTemp():
     url = 'http://startrack.farmous.net/post.php'
     temp = readTemp()
-    payload = {'temp': temp}
+    payload = {'nid': 1, 'time': 1, 'spd': 12.4, 'pos': '3/2', 'temp': temp}
     token = jwt.encode(payload, 'example_key', algorithm='HS256')
     try:
         r = requests.post(url, data={'jwt': token})
         print(strftime("%Y-%m-%d %H:%M:%S"),
-              r.status_code, r.reason, temp)
+              r.status_code, r.reason, temp, token)
     except requests.exceptions.RequestException as err:
         print(strftime("%Y-%m-%d %H:%M:%S"), "Requests Exception:", err)
 

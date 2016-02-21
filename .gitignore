@@ -10,3 +10,9 @@ field_node/private.py
 field_node/private.cfg
 
 server/vendor/
+
+server/data/
+
+server/log/
+
+server/jwt_key.php
