@@ -13,10 +13,10 @@ class Distance:
 
         def get_layer_signals(layer):
             if layer == 0:
-                #self.rows_per_layer.append(reel['windings_outer_layer'])
+                # self.rows_per_layer.append(reel['windings_outer_layer'])
                 return reel['windings_outer_layer'] * reel['sensor_targets']
             else:
-                #self.rows_per_layer.append(reel['windings_max'])
+                # self.rows_per_layer.append(reel['windings_max'])
                 return (reel['windings_max'] * reel['sensor_targets'])
 
         def get_sum_signals(layer, layer_signals):
@@ -27,12 +27,11 @@ class Distance:
 
         def get_layer_radius(layer):
             return (reel['inner_radius'] +
-                    (reel['max_layers'] - (layer + 1)) * reel['hose_diameter'] +
-                    hose_pull_point)
+                    (reel['max_layers'] - (layer + 1)) *
+                    reel['hose_diameter'] + hose_pull_point)
 
         def get_length_per_signal(radius):
-            return round((2*radius*pi) / float(reel['sensor_targets']), 2)
-
+            return round((2 * radius * pi) / float(reel['sensor_targets']), 2)
 
         for i in range(reel['max_layers']):
             self.layer_signals.append(get_layer_signals(i))
@@ -43,7 +42,7 @@ class Distance:
 
         print('cm / signal [layer]:  ', self.length_per_signal)
         print('signal/layer [layer]: ', self.layer_signals)
-        #print('row / layer [layer]:  ', self.rows_per_layer)
+        # print('row / layer [layer]:  ', self.rows_per_layer)
 
     def layer(self, rotation_count):
         """ Returns current layer. 0 is outer layer. """
@@ -53,14 +52,14 @@ class Distance:
         else:
             return i
 
-    def layer_hr(self, rotation_count): # _hr -> human readable
+    def layer_hr(self, rotation_count):  # _hr -> human readable
         """ Takes rotation_count, returns layer. 1 is inner. """
         return self.reel['max_layers'] - self.layer(rotation_count)
 
     def length(self, rotation_count, offset=0):
         """ Returns distance between rotation_count and offset in cm """
         return ( self.length_remaining(rotation_count) -
-                 self.length_remaining(rotation_count-offset) )
+                 self.length_remaining(rotation_count - offset) )
 
     def length_remaining(self, rotation_count):
         """ Takes rotation_count and returns distance to 0 in cm. """

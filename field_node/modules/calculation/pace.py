@@ -15,7 +15,7 @@ class Pace:
 
     def get_pace(self, offset=3):
         try:
-            return self.time_buffer[-1] - self.time_buffer[-1-offset]
+            return self.time_buffer[-1] - self.time_buffer[-1 - offset]
         except IndexError:
             return 0
 
