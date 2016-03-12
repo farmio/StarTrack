@@ -1,17 +1,17 @@
 from operator import itemgetter
-
+import RPi.GPIO as GPIO
 import Adafruit_CharLCD as AdaLCD
 
 
 class Display(AdaLCD.Adafruit_CharLCD):
     # spawning two threads updating the display simultaniously couses errors
-    def __init__(self, lcd, source):
-        lcd_prefs = [lcd['rs'],
-                     lcd['en'],
-                     lcd['d4'],
-                     lcd['d5'],
-                     lcd['d6'],
-                     lcd['d7'],
+    def __init__(self, gpio_pins, lcd, source):
+        lcd_prefs = [gpio_pins['rs'],
+                     gpio_pins['en'],
+                     gpio_pins['d4'],
+                     gpio_pins['d5'],
+                     gpio_pins['d6'],
+                     gpio_pins['d7'],
                      lcd['columns'],
                      lcd['rows']]
         AdaLCD.Adafruit_CharLCD.__init__(self, *lcd_prefs)
@@ -26,16 +26,22 @@ class Display(AdaLCD.Adafruit_CharLCD):
         SYM_CLOCK = [0, 14, 21, 23, 17, 14, 0, 0]
         SYM_HOURGLASS = [31, 17, 10, 4, 10, 17, 31, 0]
         SYM_KNOB = [4, 4, 4, 12, 12, 4, 4, 4]
+        SYM_CIRCLE = [0, 14, 17, 17, 17, 14, 0, 0]
+        SYM_CIRCLE_FULL = [0, 14, 31, 27, 31, 14, 0, 0]
         self.create_char(0, SYM_LENGTH)
         self.create_char(1, SYM_LAYER)
         self.create_char(2, SYM_CLOCK)
         self.create_char(3, SYM_HOURGLASS)
         self.create_char(4, SYM_KNOB)
+        self.create_char(5, SYM_CIRCLE)
+        self.create_char(6, SYM_CIRCLE_FULL)
         self.sym_length = '\x00'
         self.sym_layer = '\x01'
         self.sym_clock = '\x02'
         self.sym_hourglass = '\x03'
         self.sym_knob = '\x04'
+        self.sym_circle = '\x05'
+        self.sym_circle_full = '\x06'
 
     def update(self):
         """ Sort message_buffer and send to display. """
@@ -88,7 +94,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         sensors = self.source.sensors
         sensor_message = ''
         for i in sensors:
-            sensor_message += '_' if i else '-'
+            sensor_message += self.sym_circle_full if i else self.sym_circle
         self.message_buffer.append( (9, 0, (str(sensor_message).ljust(2))) )
         self.update()
 
@@ -116,3 +122,23 @@ class Display(AdaLCD.Adafruit_CharLCD):
 # L:10|11     T-112:34#2
 #                    #3
 # #####################
+
+if __name__ == '__main__':
+    from config import Config
+    from status import Status
+    from distance import Distance
+    from pace import Pace
+    f = file('../config.cfg')
+    cfg = Config(f)
+
+    distance = Distance(cfg.reel)
+    pace = Pace()
+    status = Status(distance, pace)
+    display = Display(cfg.gpio_pins.display, cfg.lcd, status)
+
+    try:
+        print('Waiting for Interrupt')
+        while 1:
+            pass
+    except KeyboardInterrupt:
+        GPIO.cleanup()

@@ -33,4 +33,4 @@ class Network:
         pass
 
 
-Sakis3g.connect()
+# Sakis3g.connect()

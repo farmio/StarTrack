@@ -40,8 +40,8 @@ class Distance:
             self.length_per_signal.append(
                 get_length_per_signal(self.layer_radius[i]))
 
-        print('cm / signal [layer]:  ', self.length_per_signal)
-        print('signal/layer [layer]: ', self.layer_signals)
+        # print('cm / signal [layer]:  ', self.length_per_signal)
+        # print('signal/layer [layer]: ', self.layer_signals)
         # print('row / layer [layer]:  ', self.rows_per_layer)
 
     def layer(self, rotation_count):

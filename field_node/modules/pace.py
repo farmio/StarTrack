@@ -28,6 +28,9 @@ class Pace:
             except IndexError:
                 pass
 
+    def reset(self):
+        self.time_buffer[:] = []
+
 
 if __name__ == "__main__":
     s = Pace()

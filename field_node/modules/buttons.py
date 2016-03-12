@@ -89,14 +89,13 @@ def enter_action():
 def do_nothing():
     pass
 
-plus_button = Button(14)
-minus_button = Button_hold(15)
+if __name__ == '__main__':
+    plus_button = Button(14)
+    minus_button = Button_hold(15)
 
-try:
-    print('Waiting for Interrupt')
-    while 1:
-        pass
-except KeyboardInterrupt:
-    GPIO.cleanup()
-
-GPIO.cleanup()
+    try:
+        print('Waiting for Interrupt')
+        while 1:
+            pass
+    except KeyboardInterrupt:
+        GPIO.cleanup()

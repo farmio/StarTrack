@@ -32,6 +32,10 @@ class Status:
             self.row_update(_row)
         return(self.rotation_count)
 
+    def rotation_set(self, new_rotation_count):
+        self.rotation_count = new_rotation_count
+        self.pace.reset()
+
     def layer_update(self, last):
         print('layer_update')
 

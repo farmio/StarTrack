@@ -10,14 +10,19 @@ from modules import *
 f = file('config.cfg')
 cfg = Config(f)
 
-# Sensors need 2nd argument 1 or 2
-sensor_one = Sensor(config.rot_sensors['front'], 1)
-sensor_two = Sensor(config.rot_sensors['rear'], 2)
+# Proximity Sensors need 2nd argument 1 or 2
+sensor_one = Proximity_Sensor(cfg.gpio_pins.sensors['front'],
+                              cfg.rot_sensors,
+                              1)
+sensor_two = Proximity_Sensor(cfg.gpio_pins.sensors['rear'],
+                              cfg.rot_sensors,
+                              2)
 
-distance = Distance(config.reel)
+distance = Distance(cfg.reel)
 pace = Pace()
 status = Status(distance, pace)
-display = Display(config.lcd, status)
+display = Display(cfg.gpio_pins.display, cfg.lcd, status)
+
 # adn = Adn(private.adn)
 
 # set delegates
@@ -39,18 +44,18 @@ def on_rotation_signal(*args, **kwargs):
     # this triggers rotation_count calculation
     status.rotation_update(*args, **kwargs)
     # Alert.spy(*args, **kwargs)
-    # Queue(display.rotation_update,
-    #       display_thread,
-    #       pause=0.01).start()
+    Queue(display.rotation_update,
+          display_thread,
+          pause=0.01).start()
 
 
 @Rotation.sensor_signal.callback
 def on_sensor_signal(*args, **kwargs):
     # this happens before rotation_count calculation
     status.sensor_update(*args, **kwargs)
-    # Queue(display.sensor_update,
-    #       display_thread,
-    #       pause=0.01).start()
+    Queue(display.sensor_update,
+          display_thread,
+          pause=0.01).start()
 
 display_rotation = lambda x: Queue(display.rotation_update,
                                    display_thread,
@@ -71,20 +76,20 @@ def detatch_display():
     status.rotation_update -= display_rotation
     status.sensor_update -= display_sensors
 
-attatch_display()
+# attatch_display()
 
 
-def start_monitoring():
-    try:                # not very beautiful
-        spy
-    except NameError:                   # target
-        spy = Spy(status.speed_last_mh, 500, config.monitoring)
+# def start_monitoring():
+#    try:                # not very beautiful
+#        spy
+#    except NameError:                   # target
+#        spy = Spy(status.speed_last_mh, 500, cfg.monitoring)
 
 
-def stop_monitoring():
-    del spy     # ????????????????????? doesnot touch thread
+# def stop_monitoring():
+#    del spy     # ????????????????????? doesnot touch thread
 
-start_monitoring()
+# start_monitoring()
 
 # @Alert.now.callback
 # def network_callback(*args, **kwargs):
