@@ -11,5 +11,5 @@ from .rotation import Proximity_Sensor
 # from .spy import Spy
 from .display import Display
 # from .actions import Actions
-# from .buttons import Button
-# from .menu import Menu
+from .buttons import set_buttons
+from .menu import init_menu

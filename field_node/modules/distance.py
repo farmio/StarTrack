@@ -8,15 +8,16 @@ class Distance:
         self.sum_signals = []
         self.layer_radius = []
         self.length_per_signal = []
+        self.rows_per_layer = []
 
         hose_pull_point = round(float(reel['hose_diameter']) / 3, 1)
 
         def get_layer_signals(layer):
             if layer == 0:
-                # self.rows_per_layer.append(reel['windings_outer_layer'])
+                self.rows_per_layer.append(reel['windings_outer_layer'])
                 return reel['windings_outer_layer'] * reel['sensor_targets']
             else:
-                # self.rows_per_layer.append(reel['windings_max'])
+                self.rows_per_layer.append(reel['windings_max'])
                 return (reel['windings_max'] * reel['sensor_targets'])
 
         def get_sum_signals(layer, layer_signals):
@@ -79,3 +80,10 @@ class Distance:
         layer = self.layer(rotation_count)
         count_in_layer = self.sum_signals[layer] - rotation_count
         return count_in_layer // self.reel['sensor_targets']
+
+    def signals(self, layer, row):
+        ''' Returns rot_count for position of the middle 'row' of 'layer'. '''
+        count = self.sum_signals[layer]
+        count -= row * self.reel['sensor_targets']
+        # count -= self.reel['sensor_targets'] / 2
+        return count

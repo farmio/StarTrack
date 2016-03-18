@@ -83,9 +83,24 @@ class Status:
     def layer(self, rot=None):
         if not(rot):
             rot = self.rotation_count
+        return self.distance.layer(rot)
+
+    def layer_hr(self, rot=None):
+        if not(rot):
+            rot = self.rotation_count
         return self.distance.layer_hr(rot)
 
     def row(self, rot=None):    # int
         if not(rot):
             rot = self.rotation_count
         return self.distance.row(rot)
+
+    def rows_max(self):
+        # returns list of maximum rows per layer (0 is outer)
+        return self.distance.rows_per_layer
+
+    def set_reel(self, layer, row):
+        print('Layer: ', layer, ' - Row: ', row)
+        self.rotation_set(self.distance.signals(layer, row))
+        # self.current_layer = layer
+        # self.current_row = row

@@ -22,6 +22,8 @@ distance = Distance(cfg.reel)
 pace = Pace()
 status = Status(distance, pace)
 display = Display(cfg.gpio_pins.display, cfg.lcd, status)
+buttons = set_buttons(cfg.gpio_pins.buttons, cfg.buttons)
+menu = init_menu(display, buttons, status)
 
 # adn = Adn(private.adn)
 
@@ -57,27 +59,6 @@ def on_sensor_signal(*args, **kwargs):
           display_thread,
           pause=0.01).start()
 
-display_rotation = lambda x: Queue(display.rotation_update,
-                                   display_thread,
-                                   pause=0.01).start()
-
-display_sensors = lambda x: Queue(display.sensor_update,
-                                  display_thread,
-                                  pause=0.01).start()
-
-
-def attatch_display():
-    status.rotation_update += display_rotation
-    status.sensor_update += display_sensors
-    # status.layer_update += display.layer
-
-
-def detatch_display():
-    status.rotation_update -= display_rotation
-    status.sensor_update -= display_sensors
-
-# attatch_display()
-
 
 # def start_monitoring():
 #    try:                # not very beautiful
@@ -96,9 +77,14 @@ def detatch_display():
 #     Queue(adn.pm, network_thread).start()
 
 try:
+    i = 0
     print('Waiting for Interrupt')
     while 1:
-        pass
+        sleep(1)
+        i += 1
+        if i > 1000000:
+            print('i = ', i)
+            i = 0
 except KeyboardInterrupt:
     GPIO.cleanup()
 

@@ -1,4 +1,5 @@
 from operator import itemgetter
+
 import RPi.GPIO as GPIO
 import Adafruit_CharLCD as AdaLCD
 
@@ -15,12 +16,125 @@ class Display(AdaLCD.Adafruit_CharLCD):
                      lcd['columns'],
                      lcd['rows']]
         AdaLCD.Adafruit_CharLCD.__init__(self, *lcd_prefs)
+        self.columns = lcd['columns']
+        self.rows = lcd['rows']
         self.source = source
-        self.message_buffer = []
-        self.custom_chars()
-        self.init_display()
+        self._message_buffer = []
+        self._custom_chars()
 
-    def custom_chars(self):
+        # self.show_cursor(True)
+        self.clear()
+        self.status_3_line()
+
+    def status_3_line(self):
+        self.rotation_update = self._status_3_line
+        self._status_3_line()
+
+    def status_1_line(self):
+        self.rotation_update = self._status_1_line
+        self._status_1_line()
+
+    def _status_3_line(self):
+        self.clock()
+        self.distance()
+        self.knob_counter()
+        self.layer()
+        self.online()
+        self.speed()
+        self.time_remaining()
+
+        self._update()
+
+    def _status_1_line(self):
+        self.clock()
+        self.knob_counter()
+        self.online()
+
+        self._update()
+
+    def rotation_update(self):
+        pass
+
+    def sensor_update(self):    # display 8:11, 0
+        sensor_message = ''
+        for i in self.source.sensors:
+            sensor_message += self.sym_circle_full if i else self.sym_circle
+        self._message_buffer.append( (9, 0, (str(sensor_message).ljust(2))) )
+        self._update()
+
+    def clock(self):
+        self._message_buffer.append( (13, 0, self.source.time_str().rjust(5)) )
+
+    def knob_counter(self):
+        rot_count = self.source.rotation_count
+        rot_dir = self.source.rotation_direction
+        self._message_buffer.append( (0, 0, self.sym_knob + ' ' +
+                                     str(rot_count).rjust(5)) )
+        if rot_dir > 0:
+            self._message_buffer.append( (8, 0, '<') )
+            self._message_buffer.append( (11, 0, ' ') )
+        elif rot_dir < 0:
+            self._message_buffer.append( (8, 0, ' ') )
+            self._message_buffer.append( (11, 0, '>') )
+
+    def layer(self):
+        m = self.sym_layer + ' '
+        m += str(self.source.layer_hr()).rjust(2) + '|'
+        m += str(self.source.row()).zfill(2)
+        self._message_buffer.append( (0, 1, m) )
+
+    def distance(self):
+        self._message_buffer.append(
+            (0, 2, self.sym_length +
+             str(self.source.length_remaining_m()).rjust(6) + 'm') )
+
+    def speed(self):
+        speed = self.source.speed_last_mh(offset=3)
+        if speed < 1000:
+            self._message_buffer.append( (12, 1, str(speed).rjust(5) + 'm/h') )
+        else:
+            self._message_buffer.append( (12, 1, '>1000m/h') )
+
+    def time_remaining(self):
+        timer = self.source.time_remaining_str()
+        self._message_buffer.append( (12, 2,
+                                     timer.rjust(6) + ' ' +
+                                     self.sym_hourglass) )
+
+    def online(self):
+        pass
+
+    def write_row(self, row, message, offset=0, cent=False, prep='', app=''):
+        '''
+        Writes 'message' to 'row'.
+        If 'offset' is set 'message' is prepended with spaces.
+        If 'cent' is True 'message' will be centered.
+        'prep' gets prepended, 'app' gets appended.
+        If 'message' overflows display colums overflow is dropped.
+        '''
+        message = ' ' * offset + message
+        m_chars = self.columns
+        if prep:
+            m_chars -= len(prep)
+
+        if app:
+            m_chars -= len(app)
+
+        if cent:
+            message = message[:m_chars].center(m_chars)
+        else:
+            message = message[:m_chars].ljust(m_chars)
+
+        message = prep + message + app
+        self._message_buffer.append( (0, row, message[:self.columns]) )
+        self._update()
+
+    def clear_row(self, row):
+        spaces = ' ' * self.columns
+        self._message_buffer.append( (0, row, spaces) )
+        self._update()
+
+    def _custom_chars(self):
         SYM_LENGTH = [0, 0, 0, 17, 31, 0, 0, 0]
         SYM_LAYER = [8, 8, 20, 20, 10, 9, 4, 2]
         SYM_CLOCK = [0, 14, 21, 23, 17, 14, 0, 0]
@@ -43,84 +157,20 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.sym_circle = '\x05'
         self.sym_circle_full = '\x06'
 
-    def update(self):
-        """ Sort message_buffer and send to display. """
-        for m in sorted(self.message_buffer, key=itemgetter(1, 0)):
-            # print(m)
+    def _update(self):
+        """ Sort _message_buffer and send to display. """
+        for m in sorted(self._message_buffer, key=itemgetter(1, 0)):
             self.set_cursor(m[0], m[1])
             self.message(m[2])
-        self.message_buffer = []
-
-    def init_display(self):
-        self.clear()
-        self.message_buffer.append( (0, 0, self.sym_knob) )
-        self.message_buffer.append( (0, 1, self.sym_length) )
-        self.message_buffer.append( (8, 1, 'm') )
-        self.message_buffer.append( (0, 2, self.sym_layer) )
-        self.message_buffer.append( (4, 2, '|') )
-        self.message_buffer.append( (17, 1, 'm/h') )
-        self.message_buffer.append( (12, 2, self.sym_hourglass) )
-        self.speed()
-        self.layer()
-        self.row()
-        self.time_remaining()
-        self.clock()
-        self.update()
-
-    def clock(self):
-        self.message_buffer.append( (13, 0, self.source.time_str().rjust(5)) )
-        # self.update()
-
-    def rotation_update(self):           # display 2:7, 0; 2:8, 1
-        rot_count = self.source.rotation_count
-        rot_dir = self.source.rotation_direction
-        self.speed()
-        # self.row()
-        # self.layer()
-        self.time_remaining()
-        self.clock()
-        self.message_buffer.append( (2, 0, str(rot_count).rjust(5)) )
-        if rot_dir > 0:
-            self.message_buffer.append( (8, 0, '<') )
-            self.message_buffer.append( (11, 0, ' ') )
-        elif rot_dir < 0:
-            self.message_buffer.append( (8, 0, ' ') )
-            self.message_buffer.append( (11, 0, '>') )
-        self.message_buffer.append(
-            (2, 1, str(self.source.length_remaining_m()).rjust(6)) )
-        self.update()
-
-    def sensor_update(self):    # display 8:11, 0
-        sensors = self.source.sensors
-        sensor_message = ''
-        for i in sensors:
-            sensor_message += self.sym_circle_full if i else self.sym_circle
-        self.message_buffer.append( (9, 0, (str(sensor_message).ljust(2))) )
-        self.update()
-
-    def layer(self):
-        self.message_buffer.append( (2, 2, str(self.source.layer()).rjust(2)) )
-
-    def speed(self):
-        speed = self.source.speed_last_mh(offset=3)
-        if speed < 1000:
-            self.message_buffer.append( (11, 1, str(speed).rjust(5)) )
-        else:
-            self.message_buffer.append( (11, 1, '>1000') )
-
-    def row(self):
-        self.message_buffer.append( (5, 2, str(self.source.row()).ljust(2)) )
-
-    def time_remaining(self):
-        timer = self.source.time_remaining_str()
-        self.message_buffer.append( (14, 2, timer.rjust(6)) )
+        self._message_buffer[:] = []
+        self.home()
 
 # display segmentation
 # 0##3##6##9##2##5##8##
-# S:-1234 <--> ti:me Y#0
-# l:-400.1m  100.3 m/h#1
-# L:10|11     T-112:34#2
-#                    #3
+# K -1234 <--> ti:me Y#0
+# L 10|01     100.3m/h#1
+# d-400.1m  -112:34 T#2
+#                     #3
 # #####################
 
 if __name__ == '__main__':
@@ -131,9 +181,9 @@ if __name__ == '__main__':
     f = file('../config.cfg')
     cfg = Config(f)
 
-    distance = Distance(cfg.reel)
+    dist = Distance(cfg.reel)
     pace = Pace()
-    status = Status(distance, pace)
+    status = Status(dist, pace)
     display = Display(cfg.gpio_pins.display, cfg.lcd, status)
 
     try:

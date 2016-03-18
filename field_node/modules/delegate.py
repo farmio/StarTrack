@@ -10,6 +10,7 @@ class Delegate(object):
         self.basefunc = func
 
     def __iadd__(self, func):
+        """ Adds `func` to `self.callbacks`. """
         if callable(func):
             self.__isub__(func)
             self.callbacks.append(func)
@@ -23,11 +24,17 @@ class Delegate(object):
         return func
 
     def __isub__(self, func):
+        """ Removes `func` from `self.callbacks`. """
         try:
             self.callbacks.remove(func)
         except ValueError:
             pass
         return self
+
+    def clear(self):
+        """ Removes everything from `self.callbacks` leaving self.basefunc. """
+        for func in self.callbacks:
+            self.callbacks.remove(func)
 
     def __call__(self, *args, **kwargs):
         result = self.basefunc(*args, **kwargs)
