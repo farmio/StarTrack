@@ -48,10 +48,14 @@ class Distance:
     def layer(self, rotation_count):
         """ Returns current layer. 0 is outer layer. """
         i = 0
-        while rotation_count > self.sum_signals[i]:
-            i += 1
-        else:
-            return i
+        try:
+            while rotation_count > self.sum_signals[i]:
+                i += 1
+            else:
+                return i
+        except IndexError:
+            # if rotation_count > maximum signals for some reason
+            return i - 1
 
     def layer_hr(self, rotation_count):  # _hr -> human readable
         """ Takes rotation_count, returns layer. 1 is inner. """
@@ -66,13 +70,16 @@ class Distance:
         """ Takes rotation_count and returns distance to 0 in cm. """
         length = 0
         i = 0
-        while rotation_count > self.layer_signals[i]:
-            length += (self.layer_signals[i] *
-                       self.length_per_signal[i])
-            rotation_count -= self.layer_signals[i]
-            i += 1
-        else:
-            length += (rotation_count * self.length_per_signal[i])
+        try:
+            while rotation_count > self.layer_signals[i]:
+                length += (self.layer_signals[i] *
+                           self.length_per_signal[i])
+                rotation_count -= self.layer_signals[i]
+                i += 1
+        except IndexError:
+            # if rotation_count > maximum signals assume inner layer
+            i -= 1
+        length += (rotation_count * self.length_per_signal[i])
         return length
 
     def row(self, rotation_count):
