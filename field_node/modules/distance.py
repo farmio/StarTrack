@@ -89,8 +89,8 @@ class Distance:
         return count_in_layer // self.reel['sensor_targets']
 
     def signals(self, layer, row):
-        ''' Returns rot_count for position of the middle 'row' of 'layer'. '''
+        ''' Returns rot_count for middle position of 'row' in 'layer'. '''
         count = self.sum_signals[layer]
         count -= row * self.reel['sensor_targets']
-        # count -= self.reel['sensor_targets'] / 2
+        count -= self.reel['sensor_targets'] / 2
         return count

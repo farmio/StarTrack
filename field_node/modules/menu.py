@@ -2,6 +2,7 @@
 def init_menu(display, buttons, status):
     Menu(display, buttons, status)
     s = Set_Hose('Set Hose')
+    t = Toggle_Report('Report')
 
 
 class Menu(object):
@@ -85,18 +86,23 @@ class Item(Menu):
         # self.set_buttons = set_buttons
 
     def switch_to(self):
+        ''' Called when Menu toggles to this Item. '''
         type(self).write(self.caption, cent=True, prep='<', app='>')
 
     def select(self):
+        ''' Called when Item is picked. '''
         type(self).select_item()
 
     def enter(self):
-        pass
+        ''' Function for Button 'enter' while Item is active. '''
+        type(self).exit_menu()
 
     def plus(self):
+        ''' Function for Button 'plus' while Item is active. '''
         pass
 
     def minus(self):
+        ''' Function for Button 'minus' while Item is active. '''
         pass
 
 
@@ -117,20 +123,20 @@ class Set_Hose(Item):
             self._update()
         else:
             type(self).status.set_reel(self.layer, self.row)
-            type(self).exit_menu()
+            super(Set_Hose, self).exit_menu()
 
     def plus(self):
         if self.active == 0:
             self.layer = (self.layer + 1) % self.max_layers
         else:
-            self.row = (self.row - 1) % (self.max_rows[self.layer] + 1)
+            self.row = (self.row - 1) % self.max_rows[self.layer]
         self._update()
 
     def minus(self):
         if self.active == 0:
             self.layer = (self.layer - 1) % self.max_layers
         else:
-            self.row = (self.row + 1) % (self.max_rows[self.layer] + 1)
+            self.row = (self.row + 1) % self.max_rows[self.layer]
         self._update()
 
     def _update(self):
@@ -144,6 +150,31 @@ class Set_Hose(Item):
         message += str(self.row).zfill(2)
         type(self).write(message)
         type(self).set_blink(self.cursor)
+
+
+class Toggle_Report(Item):
+    def __init__(self, caption):
+        self._caption = caption
+        super(Toggle_Report, self).__init__(caption)
+
+    def switch_to(self):
+        ''' Called when Menu toggles to this Item. '''
+        if self.status.reporting:
+            caption_ = 'Stop '
+        else:
+            caption_ = 'Start '
+        self.caption = caption_ + self._caption
+        super(Toggle_Report, self).switch_to()
+
+    def select(self):
+        ''' Called when Item is picked. '''
+        type(self).write(self.caption + ' ?')
+        super(Toggle_Report, self).select()
+
+    def enter(self):
+        ''' Function for Button 'enter' while Item is active. '''
+        type(self).status.toggle_report()
+        super(Toggle_Report, self).exit_menu()
 
 
 menu_structure = [

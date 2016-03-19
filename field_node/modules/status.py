@@ -11,6 +11,7 @@ class Status:
         self.rotation_direction = 0
         self.current_layer = self.layer()
         self.current_row = self.row()
+        self.reporting = False
 
     def sensor_update(self, sensor_tuple):
         self.sensors = sensor_tuple
@@ -104,3 +105,10 @@ class Status:
         self.rotation_set(self.distance.signals(layer, row))
         # self.current_layer = layer
         # self.current_row = row
+
+    def toggle_report(self):
+        self.reporting = not(self.reporting)
+        if self.reporting:
+            print('Start Reporting')
+        else:
+            print('Stop Reporting')
