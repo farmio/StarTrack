@@ -7,10 +7,10 @@ class Spy:
         self.t_min = target - (target * spy_prefs['accuracy'] / 100.0)
         self.t_max = target + (target * spy_prefs['accuracy'] / 100.0)
         self.speed = speed
-        self.speed_spy = Timer(spy_prefs['alert_time'],
-                               self.alert,
-                               step=spy_prefs['update_time'],
-                               update=self.update_speed)
+        self.speed_spy = Resettable_Timer(spy_prefs['alert_time'],
+                                          self.alert,
+                                          step=spy_prefs['update_time'],
+                                          update=self.update_speed)
         self.speed_spy.start()
         # self.speed_spy.join()
 

@@ -64,8 +64,47 @@ class Queue(Thread):
 
 
 class Timer(Thread):
-    """ Resettable timer class. `Timer()` spawns a new thread. """
-    # thanks to James Stroud at code.activestate.com
+    """ Timer class. Spawns a new thread. """
+    def __init__(self, delay, func):
+        """
+        `func(self)` is called every `delay` seconds
+        Start with self.start()
+        """
+        self.delay = delay
+        self.func = func
+        Thread.__init__(self)
+        self.setDaemon(True)
+
+    def run(self):
+        sleep(self.delay)
+        self.func()
+
+
+class Infinite_Timer(Timer):
+    """ Infinite timer class. Spawns a new thread. """
+    def __init__(self, delay, func):
+        """
+        `func()` is called every `delay` seconds
+        Start with self.start()
+        """
+        self.stop = False
+        super(Infinite_Timer, self).__init(self, delay, func)
+
+    def kill(self):
+        """ Stops timer - ends thread before next update. """
+        self.stop = True
+
+    def run(self):
+        while True:
+            if self.stop:
+                return
+            else:
+                self.func()
+                sleep(self.delay)
+
+
+class Resettable_Timer(Thread):
+    """ Resettable timer class. Spawns a new thread. """
     def __init__(self, maxtime, expire, step=None, update=None):
         """
         `update(self)` is called every `step` seconds

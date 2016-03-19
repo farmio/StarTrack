@@ -65,14 +65,14 @@ class Button_hold(Button):
     def _hold(self):
         if self._listen:
             self._action()
-            self.repeat_timer = Timer(self.hold_repeat, self._hold)
+            self.repeat_timer = Resettable_Timer(self.hold_repeat, self._hold)
             self.repeat_timer.start()
 
     def _callback(self, pin):
         if not(GPIO.input(pin)):
             self._action()
             self._listen = True
-            self.hold_timer = Timer(self.hold_delay, self._hold)
+            self.hold_timer = Resettrable_Timer(self.hold_delay, self._hold)
             self.hold_timer.start()
         else:
             self._listen = False
