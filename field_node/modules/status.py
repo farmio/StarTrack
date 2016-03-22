@@ -14,13 +14,15 @@ class Status:
         self.reporting = False
 
     def sensor_update(self, sensor_tuple):
+        # triggers display update
         self.sensors = sensor_tuple
         return(sensor_tuple)
 
     def rotation_update(self, direction):
+        # triggers display update
         self.rotation_count += direction
         self.rotation_direction = direction
-        self.pace.callback(direction)
+        self.pace.turn(direction)
 
         _layer = self.current_layer
         self.current_layer = self.layer()
@@ -35,7 +37,7 @@ class Status:
 
     def rotation_set(self, new_rotation_count):
         self.rotation_count = new_rotation_count
-        self.pace.reset()
+        self.rotation_update(0)
 
     def layer_update(self, last):
         print('layer_update')

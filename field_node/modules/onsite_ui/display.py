@@ -76,6 +76,9 @@ class Display(AdaLCD.Adafruit_CharLCD):
         elif rot_dir < 0:
             self._message_buffer.append( (8, 0, ' ') )
             self._message_buffer.append( (11, 0, '>') )
+        elif rot_dir == 0:
+            self._message_buffer.append( (8, 0, ' ') )
+            self._message_buffer.append( (11, 0, ' ') )
 
     def layer(self):
         m = self.sym_layer + ' '
