@@ -1,5 +1,5 @@
-from delegate import Timer
-from delegate import Delegate
+from .helpers import Timer
+from .helpers import Delegate
 
 
 class Spy:

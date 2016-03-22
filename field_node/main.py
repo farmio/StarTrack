@@ -22,7 +22,7 @@ distance = Distance(cfg.reel)
 pace = Pace()
 status = Status(distance, pace)
 display = Display(cfg.gpio_pins.display, cfg.lcd, status)
-buttons = set_buttons(cfg.gpio_pins.buttons, cfg.buttons)
+buttons = init_buttons(cfg.gpio_pins.buttons, cfg.buttons)
 menu = init_menu(display, buttons, status)
 
 # adn = Adn(private.adn)

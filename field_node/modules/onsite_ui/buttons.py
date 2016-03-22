@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 from threading import Timer
 
 
-def set_buttons(gpio_pins, btn_cfg):
+def init_buttons(gpio_pins, btn_cfg):
     bt = btn_cfg['bouncetime']
     buttons = {'enter': Button(gpio_pins['enter'], bounce=bt),
                'esc': Button(gpio_pins['esc'], bounce=bt),

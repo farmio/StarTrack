@@ -83,7 +83,6 @@ class Item(Menu):
     def __init__(self, caption):
         type(self).items.append(self)
         self.caption = caption
-        # self.set_buttons = set_buttons
 
     def switch_to(self):
         ''' Called when Menu toggles to this Item. '''
