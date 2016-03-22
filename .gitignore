@@ -16,3 +16,5 @@ server/data/
 server/log/
 
 server/jwt_key.php
+
+client/
