@@ -1,0 +1,6 @@
+{
+    "require": {
+      "katzgrau/klogger": "dev-master",
+      "firebase/php-jwt": "*"
+    }
+}

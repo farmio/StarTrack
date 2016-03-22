@@ -1,7 +1,7 @@
-#adn
+# adn
 import requests
 import adnpy
-#email
+# email
 import smtplib
 import email.utils
 from email.MIMEText import MIMEText
@@ -14,14 +14,15 @@ class Adn:
         adnpy.api.add_authorization_token(self.access_token)
 
     def pm(self, text, recipient=None):
-        if not(recipient): recipient = self.default_recipient
+        if not(recipient):
+            recipient = self.default_recipient
         try:
-            msg, meta = adnpy.api.create_message( 'pm', data={'text': text,
-                'destinations': [recipient]} )
+            msg, meta = adnpy.api.create_message(
+                'pm', data={'text': text, 'destinations': [recipient]} )
             return meta['code']
         except requests.exceptions.ConnectionError:
             print('damn no internet')
-            return 599                  #maybe a string?
+            return 599                  # maybe a string?
 
 
 class Email:
@@ -34,8 +35,9 @@ class Email:
         self.username = credentials['login']
         self.password = credentials['password']
 
-    def send_mail(self, text, recipient=None, subject='StarTrack Notofication'):
-        if not(recipient): recipient = self.default_recipient
+    def send_mail(self, text, recipient=None, subject='StarTrack Message'):
+        if not(recipient):
+            recipient = self.default_recipient
         msg = MIMEText(text)
         msg.set_unixfrom(self.author)
         msg['To'] = recipient
@@ -52,12 +54,13 @@ class Email:
             # If we can encrypt this session, do it
             if server.has_extn('STARTTLS'):
                 server.starttls()
-                server.ehlo() # re-identify ourselves over TLS connection
+                server.ehlo()  # re-identify ourselves over TLS connection
 
             server.login(self.username, self.password)
             server.sendmail(self.from_email, [recipient], msg.as_string())
         finally:
             server.quit()
+
 
 class Alert:
     @staticmethod

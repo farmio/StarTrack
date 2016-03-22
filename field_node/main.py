@@ -1,68 +1,97 @@
 from time import sleep
 from threading import Lock
+from config import Config
 
 import RPi.GPIO as GPIO
 
-import config
-import private              #for access-tokens / mail-configuration
-from modules import Sensor
-from modules import Hose
-from modules import Delegate
-from modules import Queue
-from modules import Display
-from modules import Pace
-from modules import Status
-from modules import Adn
-from modules import Alert
+from modules import *
 
+# load config
+f = file('config.cfg')
+cfg = Config(f)
 
-#Sensors need 2nd argument 1 or 2
-sensor_one = Sensor(config.rot_sensors['front'], 1)
-sensor_two = Sensor(config.rot_sensors['rear'], 2)
+# Proximity Sensors need 2nd argument 1 or 2
+sensor_one = Proximity_Sensor(cfg.gpio_pins.sensors['front'],
+                              cfg.rot_sensors,
+                              1)
+sensor_two = Proximity_Sensor(cfg.gpio_pins.sensors['rear'],
+                              cfg.rot_sensors,
+                              2)
 
-hose = Hose(config.reel)
+distance = Distance(cfg.reel)
 pace = Pace()
-status = Status(Sensor, hose, pace)
-display = Display(config.lcd, status)
-adn = Adn(private.adn)
+status = Status(distance, pace)
+display = Display(cfg.gpio_pins.display, cfg.lcd, status)
+buttons = init_buttons(cfg.gpio_pins.buttons, cfg.buttons)
+menu = init_menu(display, buttons, status)
 
-#set delegates
-Sensor.rotation_callback = Delegate(Sensor.rotation_callback)
-Sensor.sensor_callback = Delegate(Sensor.sensor_callback)
-Alert.now = Delegate(Alert.now)
+# adn = Adn(private.adn)
 
-@Sensor.rotation_callback.callback
-def rotation(*args, **kwargs):
-    pace.callback(*args, **kwargs)
-    Alert.spy(*args, **kwargs)
+# set delegates
+Rotation.signal = Delegate(Rotation.signal)
+Rotation.sensor_signal = Delegate(Rotation.sensor_signal)
+status.sensor_update = Delegate(status.sensor_update)
+status.rotation_update = Delegate(status.rotation_update)
+# status.layer_update = Delegate(status.layer_update)
+# status.row_update = Delegate(status.row_update)
+# Alert.now = Delegate(Alert.now)
 
-#initialise thread locks for display
-display_thread = Lock()
+# initialise thread locks
+# display_thread = Lock()
+# network_thread = Lock()
 
-@Sensor.rotation_callback.callback
-def display_rotation(*args, **kwargs):
-    Queue(display.rotation_update,
-          display_thread,
-          rest=0.01).start()
 
-@Sensor.sensor_callback.callback
-def display_sensor(*args, **kwargs):
-    Queue(display.sensor_update,
-          display_thread,
-          rest=0.01).start()
+@Rotation.signal.callback
+def on_rotation_signal(*args, **kwargs):
+    # this triggers rotation_count calculation
+    status.rotation_update(*args, **kwargs)
+    # Alert.spy(*args, **kwargs)
 
-#initialise thread locks for networking
-network_thread = Lock()
 
-@Alert.now.callback
-def network_callback(*args, **kwargs):
-    Queue(adn.pm, network_thread).start()
+@Rotation.sensor_signal.callback
+def on_sensor_signal(*args, **kwargs):
+    # this happens before rotation_count calculation
+    status.sensor_update(*args, **kwargs)
 
+
+@status.rotation_update.callback
+def rotation_update(*args, **kwargs):
+    display.rotation_update()
+
+
+@status.sensor_update.callback
+def sensor_update(*args, **kwargs):
+    display.sensor_update()
+
+
+# def start_monitoring():
+#    try:                # not very beautiful
+#        spy
+#    except NameError:                   # target
+#        spy = Spy(status.speed_last_mh, 500, cfg.monitoring)
+
+
+# def stop_monitoring():
+#    del spy     # ????????????????????? doesnot touch thread
+
+# start_monitoring()
+
+# @Alert.now.callback
+# def network_callback(*args, **kwargs):
+#     Queue(adn.pm, network_thread).start()
 
 try:
+    i = 0
     print('Waiting for Interrupt')
+    while i < 5:
+        i += 1
+        status.rotation_update(1)
     while 1:
-        pass
+        sleep(1)
+        i += 1
+        if i > 1000000:
+            print('i = ', i)
+            i = 0
 except KeyboardInterrupt:
     GPIO.cleanup()
 
