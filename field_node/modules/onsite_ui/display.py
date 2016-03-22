@@ -1,4 +1,7 @@
 from operator import itemgetter
+from time import sleep
+from threading import Thread
+from Queue import Queue
 
 import RPi.GPIO as GPIO
 import Adafruit_CharLCD as AdaLCD
@@ -21,6 +24,11 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.source = source
         self._message_buffer = []
         self._custom_chars()
+
+        self._message_queue = Queue()
+        self.thread = Thread(target=self.__update)
+        self.thread.daemon = True
+        self.thread.start()
 
         # self.show_cursor(True)
         self.clear()
@@ -161,12 +169,21 @@ class Display(AdaLCD.Adafruit_CharLCD):
         self.sym_circle_full = '\x06'
 
     def _update(self):
-        """ Sort _message_buffer and send to display. """
-        for m in sorted(self._message_buffer, key=itemgetter(1, 0)):
-            self.set_cursor(m[0], m[1])
-            self.message(m[2])
+        ''' Append _message_buffer to _message_queue '''
+        self._message_queue.put(self._message_buffer[:])
         self._message_buffer[:] = []
-        self.home()
+
+    def __update(self):
+        """ Check _message_queue for value sort _m and send to display. """
+        while True:
+            msg = self._message_queue.get()
+            for m in sorted(msg, key=itemgetter(1, 0)):
+                self.set_cursor(m[0], m[1])
+                self.message(m[2])
+            self.home()
+            # sleep for a while to avoid display errors
+            # sleep(0.01)
+            self._message_queue.task_done()
 
 # display segmentation
 # 0##3##6##9##2##5##8##

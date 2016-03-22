@@ -32,12 +32,12 @@ Rotation.signal = Delegate(Rotation.signal)
 Rotation.sensor_signal = Delegate(Rotation.sensor_signal)
 status.sensor_update = Delegate(status.sensor_update)
 status.rotation_update = Delegate(status.rotation_update)
-status.layer_update = Delegate(status.layer_update)
-status.row_update = Delegate(status.row_update)
+# status.layer_update = Delegate(status.layer_update)
+# status.row_update = Delegate(status.row_update)
 # Alert.now = Delegate(Alert.now)
 
 # initialise thread locks
-display_thread = Lock()
+# display_thread = Lock()
 # network_thread = Lock()
 
 
@@ -46,18 +46,22 @@ def on_rotation_signal(*args, **kwargs):
     # this triggers rotation_count calculation
     status.rotation_update(*args, **kwargs)
     # Alert.spy(*args, **kwargs)
-    Queue(display.rotation_update,
-          display_thread,
-          pause=0.01).start()
 
 
 @Rotation.sensor_signal.callback
 def on_sensor_signal(*args, **kwargs):
     # this happens before rotation_count calculation
     status.sensor_update(*args, **kwargs)
-    Queue(display.sensor_update,
-          display_thread,
-          pause=0.01).start()
+
+
+@status.rotation_update.callback
+def rotation_update(*args, **kwargs):
+    display.rotation_update()
+
+
+@status.sensor_update.callback
+def sensor_update(*args, **kwargs):
+    display.sensor_update()
 
 
 # def start_monitoring():
@@ -79,6 +83,9 @@ def on_sensor_signal(*args, **kwargs):
 try:
     i = 0
     print('Waiting for Interrupt')
+    while i < 5:
+        i += 1
+        status.rotation_update(1)
     while 1:
         sleep(1)
         i += 1

@@ -22,7 +22,6 @@ class Menu(object):
 
     @staticmethod
     def show_menu():
-        Menu.set_blink(0)
         Menu.btn['esc'].set_action(Menu.exit_menu)
         Menu.btn['plus'].set_action(Menu.next_item)
         Menu.btn['minus'].set_action(Menu.prev_item)
@@ -58,25 +57,10 @@ class Menu(object):
         Menu.btn['esc'].del_action()
         Menu.btn['plus'].del_action()
         Menu.btn['minus'].del_action()
-        Menu.set_blink(False)
 
     @staticmethod
     def write(*args, **kwargs):
         Menu.disp.write_row(Menu.disp_row, *args, **kwargs)
-
-    @staticmethod
-    def set_blink(column):
-        if column:
-            # Menu.disp.show_cursor(False)
-            Menu.disp.blink(True)
-            Menu.disp.set_cursor(column - 1, Menu.disp_row)
-        else:
-            # Menu.disp.show_cursor(False)
-            Menu.disp.blink(False)
-
-    @staticmethod
-    def hide_cursor():
-        Menu.disp.show_cursor(False)
 
 
 class Item(Menu):
@@ -141,14 +125,12 @@ class Set_Hose(Item):
     def _update(self):
         if self.active == 0:
             message = 'Layer: '
-            self.cursor = 9
+            message += str(self.max_layers - self.layer).rjust(2)
         else:
             message = 'Row:   '
-            self.cursor = 12
-        message += str(self.max_layers - self.layer).rjust(2) + '|'
-        message += str(self.row).zfill(2)
+            message += str(self.max_layers - self.layer).rjust(2) + '|'
+            message += str(self.row).zfill(2)
         type(self).write(message)
-        type(self).set_blink(self.cursor)
 
 
 class Toggle_Report(Item):
@@ -174,11 +156,3 @@ class Toggle_Report(Item):
         ''' Function for Button 'enter' while Item is active. '''
         type(self).status.toggle_report()
         super(Toggle_Report, self).exit_menu()
-
-
-menu_structure = [
-    {'id': 1,
-     'caption': 'Set Hose',
-     'type': Set_Hose,
-     }
-]
