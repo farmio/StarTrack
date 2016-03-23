@@ -92,7 +92,6 @@ class Item(Menu):
 class Set_Hose(Item):
     def select(self):
         self.active = 0
-        self.cursor = None
         self.layer = type(self).status.layer()
         self.row = type(self).status.row()
         self.max_rows = type(self).status.rows_max()
@@ -103,10 +102,14 @@ class Set_Hose(Item):
     def enter(self):
         if self.active == 0:
             self.active = 1
+            print('Row:     ', self.row)
+            print('Max Rows:', self.max_rows[self.layer])
+            if self.row >= self.max_rows[self.layer]:
+                self.row = self.max_rows[self.layer] - 1
             self._update()
         else:
             type(self).status.set_reel(self.layer, self.row)
-            super(Set_Hose, self).exit_menu()
+            super(Set_Hose, self).enter()
 
     def plus(self):
         if self.active == 0:

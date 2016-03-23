@@ -99,7 +99,7 @@ class Status:
         return self.distance.row(rot)
 
     def rows_max(self):
-        # returns list of maximum rows per layer (0 is outer)
+        # returns list of number of rows per layer (0 is outer)
         return self.distance.rows_per_layer
 
     def set_reel(self, layer, row):
