@@ -10,6 +10,9 @@ from modules import *
 f = file('config.cfg')
 cfg = Config(f)
 
+
+# Set up modules
+
 # Proximity Sensors need 2nd argument 1 or 2
 sensor_one = Proximity_Sensor(cfg.gpio_pins.sensors['front'],
                               cfg.rot_sensors,
@@ -21,10 +24,12 @@ sensor_two = Proximity_Sensor(cfg.gpio_pins.sensors['rear'],
 distance = Distance(cfg.reel)
 pace = Pace()
 status = Status(distance, pace)
+
 display = Display(cfg.gpio_pins.display, cfg.lcd, status)
 buttons = init_buttons(cfg.gpio_pins.buttons, cfg.buttons)
 menu = init_menu(display, buttons, status)
 
+Http_Client(cfg.private.http, status, cfg.general['id'])
 # adn = Adn(private.adn)
 
 # set delegates
@@ -40,27 +45,18 @@ status.rotation_update = Delegate(status.rotation_update)
 # display_thread = Lock()
 # network_thread = Lock()
 
-
-@Rotation.signal.callback
-def on_rotation_signal(*args, **kwargs):
-    # this triggers rotation_count calculation
-    status.rotation_update(*args, **kwargs)
-    # Alert.spy(*args, **kwargs)
-
-
-@Rotation.sensor_signal.callback
-def on_sensor_signal(*args, **kwargs):
-    # this happens before rotation_count calculation
-    status.sensor_update(*args, **kwargs)
+# attach Sensors to status
+Rotation.signal += status.rotation_update
+Rotation.sensor_signal += status.sensor_update
 
 
 @status.rotation_update.callback
-def rotation_update(*args, **kwargs):
+def on_rotation_update(*args, **kwargs):
     display.rotation_update()
 
 
 @status.sensor_update.callback
-def sensor_update(*args, **kwargs):
+def on_sensor_update(*args, **kwargs):
     display.sensor_update()
 
 
