@@ -1,4 +1,4 @@
-from threading import Thread, Lock
+from threading import Thread
 try:
     import subprocess32 as subprocess
     import Queue as queue
@@ -61,7 +61,7 @@ class UMTS(object):
                 print 'Busy'
                 raise queue.Full
         except queue.Full:
-            print 'Queue Full'
+            print 'UMTS Queue Full'
             if callable(callback):
                 callback(-1)
 
