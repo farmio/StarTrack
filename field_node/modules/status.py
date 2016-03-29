@@ -133,15 +133,43 @@ class Status:
         # self.current_layer = layer
         # self.current_row = row
 
-    def toggle_report(self):
-        self.reporting = not(self.reporting)
-        if self.reporting:
-            print('Start Reporting')
+    def start_report(self):
+        self.reporting = True
+
+    def stop_report(self):
+        self.reporting = False
+
+    def umts_status_update(self, returncode):
+        # return code 0 -> connected; 6 -> not connected.
+        if returncode == 0:
+            print 'status: connected'
+        elif returncode == 6:
+            print 'status: not connected'
+
+    def umts_connected(self, returncode):
+        if returncode == 0:
+            print 'connected'
+            self.umts_status_update(0)
         else:
-            print('Stop Reporting')
-        return(self.reporting)
+            pass
+
+    def umts_disconnected(self, returncode):
+        if returncode == 0:
+            print 'disconnected'
+            self.umts_status_update(6)
+        else:
+            pass
 
     # following methods may be overwritten by optional modules
+
+    def reconnect_umts(self):
+        pass
+
+    def disconnect_umts(self):
+        pass
+
+    def gsm_signal(self):
+        return 0
 
     def temperature(self):
         return 0

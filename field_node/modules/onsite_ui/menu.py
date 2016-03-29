@@ -3,6 +3,7 @@ def init_menu(display, buttons, status):
     Menu(display, buttons, status)
     s = Set_Hose('Set Hose')
     t = Toggle_Report('Report')
+    u = UMTS_Connection('3G Connection')
 
 
 class Menu(object):
@@ -157,5 +158,35 @@ class Toggle_Report(Item):
 
     def enter(self):
         ''' Function for Button 'enter' while Item is active. '''
-        type(self).status.toggle_report()
+        if type(self).status.reporting:
+            type(self).status.stop_report()
+        else:
+            type(self).status.start_report()
         super(Toggle_Report, self).exit_menu()
+
+class UMTS_Connection(Item):
+    def select(self):
+        self._active = False
+        self._update()
+        super(UMTS_Connection, self).select()
+
+    def _update(self):
+        if not self._active:
+            type(self).write('Reconnect 3G ?')
+        else:
+            type(self).write('Disconnect 3G ?')
+
+    def enter(self):
+        if not self._active:
+            type(self).status.reconnect_umts()
+        else:
+            type(self).status.disconnect_umts()
+        type(self).exit_menu()
+
+    def plus(self):
+        self._active = not(self._active)
+        self._update()
+
+    def minus(self):
+        self._active = not(self._active)
+        self._update()

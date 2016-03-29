@@ -61,7 +61,7 @@ For 3G connectivity:
 
 - ppp
 - wvdial
-- sakis3g: http://www.sakis3g.com/ - copy to /usr/bin/
+- sakis3g: http://www.sakis3g.com/ | https://github.com/taoyuan/sakis3g-source
 
 
 ###Python modules
@@ -72,6 +72,7 @@ For 3G connectivity:
 - requests
 - adnpy (Python 2 only)
 - config
+- PyJWT
 
 
 ##Licence

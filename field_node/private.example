@@ -1,4 +1,10 @@
 #rename this file to 'private.cfg'
+
+http : {
+    url : 'http://example.com/post',
+    key : 'KEY'
+}
+
 adn : {
     'access_token': 'YOUR_ADN_ACCESS_TOKEN',
     'recipient': '@example' #app.net user id or @NAME
