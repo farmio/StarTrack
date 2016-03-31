@@ -1,4 +1,5 @@
 import time
+import logging
 from datetime import datetime
 
 
@@ -14,12 +15,12 @@ class Status:
         self.reporting = False
 
     def sensor_update(self, sensor_tuple):
-        # triggers display update
+        ''' Updates sensor state. '''
         self.sensors = sensor_tuple
         return(sensor_tuple)
 
     def rotation_update(self, direction):
-        # triggers display update
+        ''' Updates rotation_count, layer and row. '''
         self.rotation_count += direction
         self.rotation_direction = direction
         self.pace.turn(direction)
@@ -36,19 +37,22 @@ class Status:
         return(self.rotation_count)
 
     def rotation_set(self, new_rotation_count):
+        ''' Sets rotation_count to 'new_rotation_count', resets pace. '''
         self.rotation_count = new_rotation_count
         self.rotation_update(0)
 
     def layer_update(self, last):
-        print('layer_update')
+        logging.info('layer_update')
 
     def row_update(self, last):
-        print('row_update')
+        logging.info('row_update')
 
     def length_remaining(self):
+        ''' Returns remaining cm until rotation_count 0. '''
         return(self.distance.length_remaining(self.rotation_count))
 
     def length_remaining_m(self):
+        ''' Returns float of remaining meters until rotation_count 0. '''
         meters = round(
             float(self.length_remaining()) /
             100.0,
@@ -56,15 +60,22 @@ class Status:
         return meters
 
     def time_str(self):
+        ''' Returns string of current time. '''
         return time.strftime('%H:%M')
 
     def time_remaining(self, offset=3):
+        ''' Returns remaining time until rotation_count 0. '''
         try:
             return (self.length_remaining() / self.speed_last(offset))
         except ZeroDivisionError:
             return 0
 
     def time_remaining_str(self, offset=3):
+        '''
+        Returns string of remaining time until rotation_count is 0.
+        Time is calculated from average pace of last 'offset' knobs.
+        Format is "(hh)h:mm".
+        '''
         ti = int(self.time_remaining(offset)) // 60
         hours = ti // 60
         if hours > 999:
@@ -73,9 +84,11 @@ class Status:
         return ( str(hours) + ':' + str(minutes).zfill(2) )
 
     def speed_last_mh(self, offset=1):
+        ''' Returns average speed of last 'x' knobs in m/h. '''
         return (round( self.speed_last(offset) * 36, 1))
 
-    def speed_last(self, x):    # in cm/sek
+    def speed_last(self, x):
+        ''' Returns average speed of last 'x' knobs in cm/sek. '''
         try:
             return ( self.distance.length(self.rotation_count,
                                           offset=x) /
@@ -84,33 +97,87 @@ class Status:
             return 0
 
     def layer(self, rot=None):
+        '''
+        Returns current layer or layer for 'rot' rotation_count if given.
+        0 is outer layer.
+        '''
         if not(rot):
             rot = self.rotation_count
         return self.distance.layer(rot)
 
     def layer_hr(self, rot=None):
+        '''
+        Returns current layer or layer for 'rot' rotation_count if given.
+        Starts at 1 for inner layer.
+        '''
         if not(rot):
             rot = self.rotation_count
         return self.distance.layer_hr(rot)
 
-    def row(self, rot=None):    # int
+    def row(self, rot=None):
+        '''
+        Returns current row or row for 'rot' rotation_count if given.
+        Starting at 0.
+        '''
         if not(rot):
             rot = self.rotation_count
         return self.distance.row(rot)
 
     def rows_max(self):
-        # returns list of maximum rows per layer (0 is outer)
+        ''' Returns list of number of rows per layer ([0] is outer layer) '''
         return self.distance.rows_per_layer
 
     def set_reel(self, layer, row):
-        print('Layer: ', layer, ' - Row: ', row)
+        ''' Sets current reel position to 'row' in 'layer', resets pace. '''
+        logging.info('Layer: %s - Row: %s', layer, row)
         self.rotation_set(self.distance.signals(layer, row))
         # self.current_layer = layer
         # self.current_row = row
 
-    def toggle_report(self):
-        self.reporting = not(self.reporting)
-        if self.reporting:
-            print('Start Reporting')
+    def start_report(self):
+        self.reporting = True
+
+    def stop_report(self):
+        self.reporting = False
+
+    def umts_status_update(self, returncode):
+        # return code 0 -> connected; 6 -> not connected.
+        if returncode == 0:
+            logging.warning('status: connected')
+        elif returncode == 6:
+            logging.warning('status: not connected')
+        elif:
+            logging.error('status err: %s', returncode)
+
+    def umts_connected(self, returncode):
+        if returncode == 0:
+            logging.warning('connected')
+            self.umts_status_update(0)
         else:
-            print('Stop Reporting')
+            logging.error('connect err: %s', returncode)
+
+    def umts_disconnected(self, returncode):
+        if returncode == 0:
+            logging.warning('disconnected')
+            self.umts_status_update(6)
+        else:
+            logging.error('disconnect err: %s', returncode)
+
+    # following methods may be overwritten by optional modules
+
+    def reconnect_umts(self):
+        # network.UMTS.connect
+        pass
+
+    def disconnect_umts(self):
+        # network.UMTS.disconnect
+        pass
+
+    def gsm_signal(self):
+        return 0
+
+    def temperature(self):
+        return 0
+
+    def battery_voltage(self):
+        return 0

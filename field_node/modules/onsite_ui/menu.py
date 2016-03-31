@@ -3,6 +3,7 @@ def init_menu(display, buttons, status):
     Menu(display, buttons, status)
     s = Set_Hose('Set Hose')
     t = Toggle_Report('Report')
+    u = UMTS_Connection('3G Connection')
 
 
 class Menu(object):
@@ -51,12 +52,16 @@ class Menu(object):
 
     @staticmethod
     def exit_menu():
-        Menu.disp.clear_row(Menu.disp_row)
+        Menu.clear_row(Menu.disp_row)
         Menu.current_item = 0
         Menu.btn['enter'].set_action(Menu.show_menu)
-        Menu.btn['esc'].del_action()
+        Menu.btn['esc'].set_action(Menu.clear_row)
         Menu.btn['plus'].del_action()
         Menu.btn['minus'].del_action()
+
+    @staticmethod
+    def clear_row(*args, **kwargs):
+        Menu.disp.clear_row(Menu.disp_row)
 
     @staticmethod
     def write(*args, **kwargs):
@@ -92,7 +97,6 @@ class Item(Menu):
 class Set_Hose(Item):
     def select(self):
         self.active = 0
-        self.cursor = None
         self.layer = type(self).status.layer()
         self.row = type(self).status.row()
         self.max_rows = type(self).status.rows_max()
@@ -103,10 +107,12 @@ class Set_Hose(Item):
     def enter(self):
         if self.active == 0:
             self.active = 1
+            if self.row >= self.max_rows[self.layer]:
+                self.row = self.max_rows[self.layer] - 1
             self._update()
         else:
             type(self).status.set_reel(self.layer, self.row)
-            super(Set_Hose, self).exit_menu()
+            super(Set_Hose, self).enter()
 
     def plus(self):
         if self.active == 0:
@@ -139,7 +145,6 @@ class Toggle_Report(Item):
         super(Toggle_Report, self).__init__(caption)
 
     def switch_to(self):
-        ''' Called when Menu toggles to this Item. '''
         if self.status.reporting:
             caption_ = 'Stop '
         else:
@@ -148,11 +153,40 @@ class Toggle_Report(Item):
         super(Toggle_Report, self).switch_to()
 
     def select(self):
-        ''' Called when Item is picked. '''
         type(self).write(self.caption + ' ?')
         super(Toggle_Report, self).select()
 
     def enter(self):
-        ''' Function for Button 'enter' while Item is active. '''
-        type(self).status.toggle_report()
         super(Toggle_Report, self).exit_menu()
+        if type(self).status.reporting:
+            type(self).status.stop_report()
+        else:
+            type(self).status.start_report()
+
+
+class UMTS_Connection(Item):
+    def select(self):
+        self._active = False
+        self._update()
+        super(UMTS_Connection, self).select()
+
+    def _update(self):
+        if not self._active:
+            type(self).write('Reconnect 3G ?')
+        else:
+            type(self).write('Disconnect 3G ?')
+
+    def enter(self):
+        type(self).exit_menu()
+        if not self._active:
+            type(self).status.reconnect_umts()
+        else:
+            type(self).status.disconnect_umts()
+
+    def plus(self):
+        self._active = not(self._active)
+        self._update()
+
+    def minus(self):
+        self._active = not(self._active)
+        self._update()
