@@ -1,7 +1,7 @@
 from time import sleep
-from threading import Lock
 from config import Config
 
+import logging
 import RPi.GPIO as GPIO
 
 from modules import *
@@ -29,6 +29,7 @@ display = Display(cfg.gpio_pins.display, cfg.lcd, status)
 buttons = init_buttons(cfg.gpio_pins.buttons, cfg.buttons)
 menu = init_menu(display, buttons, status)
 
+
 Http_Client(cfg.private.http, status, cfg.general['id'])
 UMTS(cfg.network.sakis3g)
 UMTS.set_callbacks(status)
@@ -44,11 +45,7 @@ status.stop_report = Delegate(status.stop_report)
 status.umts_connected = Delegate(status.umts_connected)
 # status.layer_update = Delegate(status.layer_update)
 # status.row_update = Delegate(status.row_update)
-# Alert.now = Delegate(Alert.now)
 
-# initialise thread locks
-# display_thread = Lock()
-# network_thread = Lock()
 
 # attach Sensors to status
 Rotation.signal += status.rotation_update
@@ -81,13 +78,29 @@ def on_stop_report(*args, **kwargs):
     # UMTS.disconnect()
 
 
-# @Alert.now.callback
-# def network_callback(*args, **kwargs):
-#     Queue(adn.pm, network_thread).start()
+# logging
+class DisplayHandler(logging.Handler):
+    def emit(self, record):
+        log_entry = self.format(record)
+        display.write_row(3, log_entry, prep='>')
+
+logger = logging.getLogger()
+formatter = logging.Formatter(
+    '%(asctime)s:%(levelname)s:%(threadName)s: %(message)s')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+disp_formatter = logging.Formatter('%(message)s')
+disp_handler = DisplayHandler()
+disp_handler.setFormatter(disp_formatter)
+# disp_handler.setLevel(logging.WARNING)
+logger.addHandler(disp_handler)
+
 
 try:
     i = 0
-    print('Waiting for Interrupt')
+    logging.info('Waiting for Interrupt')
     while i < 5:
         i += 1
         status.rotation_update(1)

@@ -1,4 +1,5 @@
 from threading import Thread
+import logging
 try:
     import subprocess32 as subprocess
     import Queue as queue
@@ -34,14 +35,14 @@ class UMTS(object):
     def connect():
         arguments = ['connect'] + UMTS.args
         callback = UMTS.connect_callback
-        print 'Connecting...'
+        logging.warning('Connecting...')
         UMTS._do(arguments, callback)
 
     @staticmethod
     def disconnect():
         arguments = ['disconnect']
         callback = UMTS.disconnect_callback
-        print 'Disconnecting...'
+        logging.warning('Disconnecting...')
         UMTS._do(arguments, callback)
 
     @staticmethod
@@ -49,7 +50,7 @@ class UMTS(object):
         ''' Calls callback(0) if connected; callback(6) if not connected. '''
         arguments = ['status']
         callback = UMTS.status_callback
-        print 'Checking connection status...'
+        logging.warning('Checking connection status...')
         UMTS._do(arguments, callback)
 
     @staticmethod
@@ -58,10 +59,10 @@ class UMTS(object):
             if not UMTS._busy:
                 UMTS._queue.put_nowait((arguments, callback))
             else:
-                print 'Busy'
+                logging.warning('Busy')
                 raise queue.Full
         except queue.Full:
-            print 'UMTS Queue Full'
+            logging.warning('UMTS Queue Full')
             if callable(callback):
                 callback(-1)
 
@@ -75,8 +76,8 @@ class UMTS(object):
                 if callable(callback):
                     callback(returncode)
             except OSError:
-                print('maybe trying to execute a non-existent file:',
-                      UMTS.sakis_path)
+                logging.error('trying to execute a non-existent file?: %s',
+                              UMTS.sakis_path)
             UMTS._queue.task_done()
             UMTS._busy = False
 
@@ -88,9 +89,9 @@ if __name__ == '__main__':
     a.disconnect()
     a.status()
     try:
-        print('Waiting for Interrupt')
+        logging.info('Waiting for Interrupt')
         while 1:
             sleep(1)
-            print 'waiting'
+            logging.info('waiting')
     except KeyboardInterrupt:
         pass

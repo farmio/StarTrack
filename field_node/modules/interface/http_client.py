@@ -1,5 +1,6 @@
-from time import time, strftime
+from time import time
 from threading import Thread
+import logging
 import requests
 import jwt
 try:
@@ -31,7 +32,7 @@ class Http_Client(object):
         try:
             Http_Client._queue.put_nowait(payload)
         except queue.Full:
-            print('Request Queue full: ', payload)
+            logging.warning('Request Queue full: %s', payload)
 
     @staticmethod
     def __query():
@@ -40,10 +41,9 @@ class Http_Client(object):
             token = jwt.encode(payload, Http_Client.key, algorithm='HS256')
             try:
                 r = requests.post(Http_Client.url, data={'jwt': token})
-                print(strftime("%Y-%m-%d %H:%M:%S"),
-                      r.status_code, r.reason)
+                logging.info('%s %s', r.status_code, r.reason)
             except requests.exceptions.RequestException as er:
-                print(strftime("%Y-%m-%d %H:%M:%S"), "Requests Exception:", er)
+                logging.warning('Requests Exception: %s', er)
             Http_Client._queue.task_done()
 
     @staticmethod

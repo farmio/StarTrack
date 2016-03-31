@@ -1,4 +1,5 @@
 import time
+import logging
 from datetime import datetime
 
 
@@ -41,10 +42,10 @@ class Status:
         self.rotation_update(0)
 
     def layer_update(self, last):
-        print('layer_update')
+        logging.info('layer_update')
 
     def row_update(self, last):
-        print('row_update')
+        logging.info('row_update')
 
     def length_remaining(self):
         ''' Returns remaining cm until rotation_count 0. '''
@@ -128,7 +129,7 @@ class Status:
 
     def set_reel(self, layer, row):
         ''' Sets current reel position to 'row' in 'layer', resets pace. '''
-        print('Layer: ', layer, ' - Row: ', row)
+        logging.info('Layer: %s - Row: %s', layer, row)
         self.rotation_set(self.distance.signals(layer, row))
         # self.current_layer = layer
         # self.current_row = row
@@ -142,30 +143,34 @@ class Status:
     def umts_status_update(self, returncode):
         # return code 0 -> connected; 6 -> not connected.
         if returncode == 0:
-            print 'status: connected'
+            logging.warning('status: connected')
         elif returncode == 6:
-            print 'status: not connected'
+            logging.warning('status: not connected')
+        elif:
+            logging.error('status err: %s', returncode)
 
     def umts_connected(self, returncode):
         if returncode == 0:
-            print 'connected'
+            logging.warning('connected')
             self.umts_status_update(0)
         else:
-            pass
+            logging.error('connect err: %s', returncode)
 
     def umts_disconnected(self, returncode):
         if returncode == 0:
-            print 'disconnected'
+            logging.warning('disconnected')
             self.umts_status_update(6)
         else:
-            pass
+            logging.error('disconnect err: %s', returncode)
 
     # following methods may be overwritten by optional modules
 
     def reconnect_umts(self):
+        # network.UMTS.connect
         pass
 
     def disconnect_umts(self):
+        # network.UMTS.disconnect
         pass
 
     def gsm_signal(self):
