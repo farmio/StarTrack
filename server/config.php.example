@@ -1,0 +1,11 @@
+<?php
+// rename to config.php
+
+return array(
+
+  'jwt_key' => 'KEY',
+
+);
+
+
+?>
