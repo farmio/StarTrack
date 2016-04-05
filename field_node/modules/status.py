@@ -64,7 +64,7 @@ class Status:
         return time.strftime('%H:%M')
 
     def time_remaining(self, offset=3):
-        ''' Returns remaining time until rotation_count 0. '''
+        ''' Returns remaining time until rotation_count 0 in sec. '''
         try:
             return (self.length_remaining() / self.speed_last(offset))
         except ZeroDivisionError:
@@ -167,17 +167,33 @@ class Status:
 
     def reconnect_umts(self):
         # network.UMTS.connect
+        # <- Menu
         pass
 
     def disconnect_umts(self):
         # network.UMTS.disconnect
+        # <- Menu
         pass
 
     def gsm_signal(self):
         return 0
 
     def temperature(self):
+        # -> Http_Client
         return 0
 
     def battery_voltage(self):
+        # -> Http_Client
+        return 0
+
+    def supply_pressure(self):
+        # -> Http_Client
+        return 0
+
+    def light_intensity(self):
+        # -> Http_Client
+        return 0
+
+    def wind_speed(self):
+        # -> Http_Client
         return 0
