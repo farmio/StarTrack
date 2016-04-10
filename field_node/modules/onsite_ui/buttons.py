@@ -1,3 +1,4 @@
+import logging
 import RPi.GPIO as GPIO
 from threading import Timer
 
@@ -44,6 +45,7 @@ class Button(object):
 
     def _callback(self, pin):
         if not(GPIO.input(pin)):
+            logging.debug('Button: %s', self)
             self._action()
 
 
