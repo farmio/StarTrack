@@ -10,7 +10,7 @@ $db_path = '../data/node_data.sqlite';
 
 $logger = new Katzgrau\KLogger\Logger('../log/');
 
-class Node extends SQLite3 {
+class Nodes extends SQLite3 {
 
   public function __construct() {
     global $db_path;
@@ -21,47 +21,31 @@ class Node extends SQLite3 {
     $this->close();
   }
 
-  public function getNodeTables() {
+  public function getNodes($max_lines) {
     //$query = "SELECT tbl_name FROM sqlite_master WHERE type = 'table' AND tbl_name LIKE 'node%'";
     $query = "SELECT tbl_name FROM sqlite_master WHERE tbl_name LIKE 'node%'";
-    $result = $this->query($query);
-    if ($result->fetchArray()[0] == null) {
+    $tables = $this->query($query);
+    if ($tables->fetchArray()[0] == null) {
       $logger->error("DB No matching Table found - " . $this->lastErrorMsg());
       return 0;
     } else {
-      $result->reset();
+      $tables->reset();
       $nodes_data = array();
-      while ($node_table = $result->fetchArray(SQLITE3_NUM)[0]) {
+      while ($node_table = $tables->fetchArray(SQLITE3_NUM)[0]) {
         $node_data = array();
         $nid = (int) str_replace('node_', '', $node_table);
         $node_data['nid'] = $nid;
         $node_data['cap'] = 'Node ' . $nid;
-        $data = new NodeData($node_table);
-        $node_data['records'] = $data->getLastN(600);
+        $node_data['records'] = $this->getNodeData($node_table, $max_lines);
         $nodes_data[] = $node_data;
       }
-      return $nodes_data;
+      return json_encode($nodes_data);
     }
   }
-}
 
-class NodeData extends SQLite3 {
-
-  private $table_name;
-
-  public function __construct($table_name) {
-    global $db_path;
-    $this->table_name = $table_name;
-    $this->open($db_path);
-  }
-
-  public function __destruct() {
-    $this->close();
-  }
-
-  public function getLastN($lines) {
+  private function getNodeData($table_name, $lines){
     try {
-      $query = "SELECT * FROM {$this->table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$this->table_name})-{$lines}";
+      $query = "SELECT * FROM {$table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$table_name})-{$lines}";
       $result = $this->query($query);
 
       $table = array();
@@ -77,9 +61,9 @@ class NodeData extends SQLite3 {
   }
 }
 
-$node = new Node();
+$nodes = new Nodes();
 
-echo(json_encode( $node->getNodeTables() ));
+echo($nodes->getNodes(600));
 
 /*
 //performance test
