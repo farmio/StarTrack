@@ -30,11 +30,17 @@ class Node extends SQLite3 {
       return 0;
     } else {
       $result->reset();
-      $node_data = array();
+      $nodes_data = array();
       while ($node_table = $result->fetchArray(SQLITE3_NUM)[0]) {
-        array_push($node_data, new NodeData($node_table));
+        $node_data = array();
+        $nid = (int) str_replace('node_', '', $node_table);
+        $node_data['nid'] = $nid;
+        $node_data['cap'] = 'Node ' . $nid;
+        $data = new NodeData($node_table);
+        $node_data['records'] = $data->getLastN(600);
+        $nodes_data[] = $node_data;
       }
-      return $node_data;
+      return $nodes_data;
     }
   }
 }
@@ -58,47 +64,12 @@ class NodeData extends SQLite3 {
       $query = "SELECT * FROM {$this->table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$this->table_name})-{$lines}";
       $result = $this->query($query);
 
-      //var_dump($result->fetchArray(SQLITE3_ASSOC));
-
-      $table = array('cols' => array(
-          // Labels for your chart, these represent the column titles.
-          array('label' => 'Time', 'type' => 'datetime'),
-          array('label' => 'Temperature', 'type' => 'number')
-        ),
-        'rows' => array());
-
-      // hardcoded Timezones here
-      $db_timezone = new DateTimeZone('UTC');
-      $user_timezone = new DateTimeZone('Europe/Vienna');
-
-      // Extract the information from $result
+      $table = array();
       while ($r = $result->fetchArray(SQLITE3_ASSOC)) {
-        // assumes dates are patterned 'yyyy-MM-dd hh:mm:ss'
-        $db_time = new DateTime($r['Time'], $db_timezone);
-        $db_time->setTimeZone($user_timezone);
+        array_push($table, $r);
+      };
 
-        $java_time = $db_time->format('Y-m-d H:i:s');
-
-        preg_match('/(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})/', $java_time, $match);
-        $year = (int) $match[1];
-        $month = (int) $match[2] - 1; // convert to zero-index to match javascript's dates
-        $day = (int) $match[3];
-        $hours = (int) $match[4];
-        $minutes = (int) $match[5];
-
-        $seconds = (int) $match[6];
-
-        array_push($table['rows'], array('c' => array(
-          array('v' => "Date($year, $month, $day, $hours, $minutes, $seconds)"),
-          array('v' => (float) $r['Temperature'])
-        )));
-
-      }
-
-      // convert data into JSON format
-      $jsonTable = json_encode($table);
-
-      return $jsonTable;
+      return $table;
 
     } catch (Exception $e) {
       $logger->error("DB Error - " . $this->lastErrorMsg());
@@ -107,9 +78,8 @@ class NodeData extends SQLite3 {
 }
 
 $node = new Node();
-$nodes = $node->getNodeTables();
-//var_dump($nodes);
-echo($nodes[0]->getLastN(600));
+
+echo(json_encode( $node->getNodeTables() ));
 
 /*
 //performance test
