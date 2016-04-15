@@ -1,6 +1,13 @@
 {
+  "autoload": {
+      "psr-0": {
+          "StarTrack": "src"
+      }
+  },
     "require": {
       "katzgrau/klogger": "dev-master",
-      "firebase/php-jwt": "*"
+      "firebase/php-jwt": "*",
+      "cboden/ratchet": "*",
+      "react/zmq": "0.2.*|0.3.*"
     }
 }

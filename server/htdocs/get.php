@@ -43,7 +43,7 @@ class Nodes extends SQLite3 {
     }
   }
 
-  private function getNodeData($table_name, $lines){
+  private function getNodeData($table_name, $lines) {
     try {
       $query = "SELECT * FROM {$table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$table_name})-{$lines}";
       $result = $this->query($query);
@@ -59,6 +59,7 @@ class Nodes extends SQLite3 {
       $logger->error("DB Error - " . $this->lastErrorMsg());
     }
   }
+  
 }
 
 $nodes = new Nodes();

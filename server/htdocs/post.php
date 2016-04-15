@@ -7,6 +7,7 @@ $dbPath = '../data/node_data.sqlite';
 
 $logger = new Katzgrau\KLogger\Logger('../log/');
 
+date_default_timezone_set('UTC');
 
 if( isset($_POST['jwt']) ){
 
@@ -33,6 +34,7 @@ function readToken($claims) {
   switch($claims->act) {
     case "push":
       dbPush($claims);
+      webSocketPush($claims);
       break;
     case "start":
       dbReset($claims->nid);
@@ -131,6 +133,41 @@ function dbReset($nid) {
 
   }
 
+}
+
+function webSocketPush($data) {
+  global $logger;
+
+  try {
+
+    $message = [];
+    $message['nid'] = (int) $data->nid;
+    $message['cap'] = "Node {$data->nid}";
+    // 'time' and 'id' are created by the database - we just need 'time'
+    $message['recent'] = ['time' => date('Y-m-d H:i:s', time())
+                          ,'rot' => (int) $data->rot
+                          ,'spd' => (float) $data->spd
+                          ,'row' => (int) $data->row
+                          ,'lay' => (int) $data->lay
+                          ,'rdm' => (int) $data->rdm
+                          ,'eta' => (int) $data->eta
+                          ,'tmp' => (float) $data->tmp
+                          ,'bat' => (int) $data->bat
+                          ,'wsp' => (int) $data->wsp
+                          ,'sli' => (int) $data->sli
+                          ,'mws' => (int) $data->mws];
+
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'st_pusher');
+    $socket->connect("tcp://localhost:5555");
+
+    $socket->send(json_encode($message));
+
+  } catch (Exception $e) {
+
+    $logger->error("Push Error - " . $e);
+
+  }
 }
 
 ?>
