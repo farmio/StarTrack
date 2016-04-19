@@ -4,8 +4,9 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
+    <link rel="stylesheet" href="css/startrack.css">
     <!--
     jquery.js
     <script src="js/d3.min.js"></script>
@@ -14,15 +15,22 @@
     -->
   </head>
   <body>
-    <div>
-      <div id="button1" class="button">+1</div>
-      <div id="button2" class="button">+2</div>
-      <div id="button3" class="button">+3</div>
-      <div id="button4" class="button">+4</div>
-      <div id="container"></div>
-    </div>
-    <div id="chart" style='height: 400px'>
-      <svg></svg>
+    <div class="container">
+      <div class="page-header">
+        <h1>StarTrack <small>field irrigation monitoring</small></h1>
+      </div>
+      <h3>Latest Status</h3>
+      <div class="row">
+        <div class="col-sm-12">
+          <p id="info-container"></p>
+        </div>
+      </div>
+      <!-- <div id="panel-row" class="row centered"> -->
+      <div id="panel-row" class="row"></div>
+
+      <div id="chart" style='height: 400px'>
+        <svg></svg>
+      </div>
     </div>
   </body>
   <script src="js/startrack.js"></script>

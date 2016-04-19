@@ -1,10 +1,12 @@
 (function(window, document, undefined) {
   var chart;
   var chartData;
-  var recent = [];
+  var recent = {};
 
   var time_format = d3.time.format.utc("%Y-%m-%d %H:%M:%S");
 
+  // '#7777ff', '#ff7f0e', '#2ca02c'      '#f07c4a'
+  // orange: ('#f0ad4e',) '#f4ac5e', '#f6b876'
   var colors = ['#7777ff', '#ff7f0e', '#2ca02c'];
   function nodeColor(nid) {    //get a color based on id
     return colors[nid % colors.length];
@@ -31,20 +33,62 @@
                   ,nid: obj.nid
                   ,color: nodeColor(obj.nid)
                 });
-      //console.log(obj.records.slice(-1));
-      recent[obj.nid] = obj.records.slice(-1);
+      console.log(obj.records);
+      recent[obj.nid] = {};
+      recent[obj.nid] = obj.records[obj.records.length - 1];
+      recent[obj.nid].cap = obj.cap;
+
+
     })
     //console.log(result);
-    console.log(recent);
+    //console.log("init recent: " + recent);
+    showRecent();
     //return array of series objects: [{key: 'Name',nid: NID, values: [{x: 1, y: 1}, ...]', color: '#123456'}, ...]
     return result;
   };
 
+// is this pushing an array or an object?
   function pushData(latest) {
     latest.recent.time = time_format.parse(latest.recent.time);
-    recent[latest.nid] = [latest.recent];
-    console.log(recent);
+    latest.recent.cap = latest.cap;
+    recent[latest.nid] = latest.recent;
+    console.log('pushData: ', recent);
+    showRecent();
     chartAddPoint(latest.nid, latest.recent.spd, latest.recent.time);
+  }
+
+  function recentPanel(nid, data) {
+    console.log(data)
+    var panel = $('<div></div>')
+      .addClass('col-sm-4')
+      .append($('<div></div>')
+        .addClass('panel panel-default')
+        //.css('border-color', nodeColor(nid))
+        //.css('background', nodeColor(nid))
+        .append($('<div></div>')
+          .addClass('panel-heading')
+          .css('background-color', convertHex(nodeColor(nid), 75))
+          .css('color', '#ffffff')
+          .append($('<h3></h3>')
+            .addClass('panel-title')
+            .text(data.cap)
+          )
+        ).append($('<div></div>')
+          .addClass('panel-body')
+          .append($('<p><b>Speed: </b>' + data['spd'] + ' m/h</p>'))
+          .append($('<p><b>Last update: </b>' + time_format(data['time']) + ' that was before ' + (data['time'] - Date.now()) + ' seconds.</p>'))
+        )
+      );
+    return panel;
+  }
+
+  function showRecent() {
+    $('#panel-row').empty();
+    console.log('showRecent: recent: ', recent)
+    $.each(recent, function(key, data) {
+      console.log('showRecent: key: ', key);
+      $('#panel-row').append(recentPanel(key, data));
+    });
   }
 
   /*These lines are all chart setup.  Pick and choose which chart features you want to utilize. */
@@ -106,13 +150,13 @@
     return obJSON;
   }
 
-  // for testing...
-
-  function buttonClicked(bid) {
-    var randInt = function() {
-      return Math.floor((Math.random() * 10) + 1)
-    };
-    chartAddPoint(bid, randInt());
+  function convertHex(hex,opacity) {
+    hex = hex.replace('#','');
+    r = parseInt(hex.substring(0,2), 16);
+    g = parseInt(hex.substring(2,4), 16);
+    b = parseInt(hex.substring(4,6), 16);
+    result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
+    return result;
   }
 
   function socketConnect() {
@@ -126,6 +170,7 @@
 
       socket.onopen = function(){
      		 console.log('Socket Status: '+socket.readyState+' (open)');
+         $('#info-container').text('Live updates ready.');
       }
 
       socket.onmessage = function(msg){
@@ -140,6 +185,12 @@
 
       socket.onclose = function(){
      		 console.log('Socket Status: '+socket.readyState+' (Closed)');
+         $('#info-container').html('No connection to Websocket. <a href="#reconnect" id="ws-reconnect">Try to reconnect.</a>');
+         $('#ws-reconnect').click(function() {
+           $('#info-container').text('Establishing websocket connection...');
+           socketConnect();
+           return false;    //prevents link form being followed by browser
+         });
       }
 
     } catch(exception){
@@ -151,53 +202,25 @@
 	   console.log(msg);
   }
 
-/*
-var connection = new autobahn.Connection({
-         url: 'wss://' + window.location.host + ':8080/socket',
-         realm: 'realm1'
-      });
-
-connection.onopen = function (session) {
-
-   // 1) subscribe to a topic
-   function onevent(args) {
-      console.log("Event:", args[0]);
-   }
-   session.subscribe('Node 2', onevent);
-
-   // 2) publish an event
-   session.publish('com.myapp.hello', ['Hello, world!']);
-
-   // 3) register a procedure for remoting
-   function add2(args) {
-      return args[0] + args[1];
-   }
-   session.register('com.myapp.add2', add2);
-
-   // 4) call a remote procedure
-   session.call('com.myapp.add2', [2, 3]).then(
-      function (res) {
-         console.log("Result:", res);
-      }
-   );
-};
-*/
-
-
 
   $(document).ready(function() {
-    $('#button1').click(function() {buttonClicked(1)})
-    $('#button2').click(function() {buttonClicked(2)})
-    $('#button3').click(function() {buttonClicked(3)})
-    //$('#button4').click(function() {buttonClicked(4)})
-
     if(!("WebSocket" in window)){
-		  $('<p>You need a browser that supports WebSockets for live updates.</p>').appendTo('#container');
+		  $('#info-container').text('You need a browser that supports WebSockets for live updates.');
 	  } else {
       //The user has WebSockets
+      $('#info-container').text('Establishing websocket connection...');
 	    socketConnect();
       //connection.open();
 	  }
   });
+
+  // for testing...
+
+  function buttonClicked(bid) {
+    var randInt = function() {
+      return Math.floor((Math.random() * 10) + 1)
+    };
+    chartAddPoint(bid, randInt());
+  }
 
 })(window, document);
