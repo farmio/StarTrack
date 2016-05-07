@@ -85,15 +85,17 @@ class DisplayHandler(logging.Handler):
         display.write_row(3, log_entry, prep='>')
 
 logger = logging.getLogger()
-formatter = logging.Formatter(
+logger.setLevel(logging.DEBUG)
+
+console_handler = logger.handlers[0]
+console_formatter = logging.Formatter(
     '%(asctime)s:%(levelname)s:%(threadName)s: %(message)s')
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+console_handler.setFormatter(console_formatter)
+
 disp_formatter = logging.Formatter('%(message)s')
 disp_handler = DisplayHandler()
 disp_handler.setFormatter(disp_formatter)
+disp_handler.setLevel(logging.INFO)
 # disp_handler.setLevel(logging.WARNING)
 logger.addHandler(disp_handler)
 

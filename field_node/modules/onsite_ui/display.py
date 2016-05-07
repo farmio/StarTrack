@@ -3,6 +3,7 @@ from time import sleep
 from threading import Thread
 from Queue import Queue
 
+import logging
 import RPi.GPIO as GPIO
 import Adafruit_CharLCD as AdaLCD
 
@@ -177,6 +178,7 @@ class Display(AdaLCD.Adafruit_CharLCD):
         """ Check _message_queue for value sort _m and send to display. """
         while True:
             msg = self._message_queue.get()
+            logging.debug('Display message: %s', msg)
             for m in sorted(msg, key=itemgetter(1, 0)):
                 self.set_cursor(m[0], m[1])
                 self.message(m[2])

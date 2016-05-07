@@ -10,7 +10,7 @@ $db_path = '../data/node_data.sqlite';
 
 $logger = new Katzgrau\KLogger\Logger('../log/');
 
-class Node extends SQLite3 {
+class Nodes extends SQLite3 {
 
   public function __construct() {
     global $db_path;
@@ -21,95 +21,50 @@ class Node extends SQLite3 {
     $this->close();
   }
 
-  public function getNodeTables() {
+  public function getNodes($max_lines) {
     //$query = "SELECT tbl_name FROM sqlite_master WHERE type = 'table' AND tbl_name LIKE 'node%'";
     $query = "SELECT tbl_name FROM sqlite_master WHERE tbl_name LIKE 'node%'";
-    $result = $this->query($query);
-    if ($result->fetchArray()[0] == null) {
+    $tables = $this->query($query);
+    if ($tables->fetchArray()[0] == null) {
       $logger->error("DB No matching Table found - " . $this->lastErrorMsg());
       return 0;
     } else {
-      $result->reset();
-      $node_data = array();
-      while ($node_table = $result->fetchArray(SQLITE3_NUM)[0]) {
-        array_push($node_data, new NodeData($node_table));
+      $tables->reset();
+      $nodes_data = array();
+      while ($node_table = $tables->fetchArray(SQLITE3_NUM)[0]) {
+        $node_data = array();
+        $nid = (int) str_replace('node_', '', $node_table);
+        $node_data['nid'] = $nid;
+        $node_data['cap'] = 'Node ' . $nid;
+        $node_data['records'] = $this->getNodeData($node_table, $max_lines);
+        $nodes_data[] = $node_data;
       }
-      return $node_data;
+      return json_encode($nodes_data);
     }
   }
-}
 
-class NodeData extends SQLite3 {
-
-  private $table_name;
-
-  public function __construct($table_name) {
-    global $db_path;
-    $this->table_name = $table_name;
-    $this->open($db_path);
-  }
-
-  public function __destruct() {
-    $this->close();
-  }
-
-  public function getLastN($lines) {
+  private function getNodeData($table_name, $lines) {
     try {
-      $query = "SELECT * FROM {$this->table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$this->table_name})-{$lines}";
+      $query = "SELECT * FROM {$table_name} LIMIT {$lines} OFFSET (SELECT COUNT(*) FROM {$table_name})-{$lines}";
       $result = $this->query($query);
 
-      //var_dump($result->fetchArray(SQLITE3_ASSOC));
-
-      $table = array('cols' => array(
-          // Labels for your chart, these represent the column titles.
-          array('label' => 'Time', 'type' => 'datetime'),
-          array('label' => 'Temperature', 'type' => 'number')
-        ),
-        'rows' => array());
-
-      // hardcoded Timezones here
-      $db_timezone = new DateTimeZone('UTC');
-      $user_timezone = new DateTimeZone('Europe/Vienna');
-
-      // Extract the information from $result
+      $table = array();
       while ($r = $result->fetchArray(SQLITE3_ASSOC)) {
-        // assumes dates are patterned 'yyyy-MM-dd hh:mm:ss'
-        $db_time = new DateTime($r['Time'], $db_timezone);
-        $db_time->setTimeZone($user_timezone);
+        array_push($table, $r);
+      };
 
-        $java_time = $db_time->format('Y-m-d H:i:s');
-
-        preg_match('/(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})/', $java_time, $match);
-        $year = (int) $match[1];
-        $month = (int) $match[2] - 1; // convert to zero-index to match javascript's dates
-        $day = (int) $match[3];
-        $hours = (int) $match[4];
-        $minutes = (int) $match[5];
-
-        $seconds = (int) $match[6];
-
-        array_push($table['rows'], array('c' => array(
-          array('v' => "Date($year, $month, $day, $hours, $minutes, $seconds)"),
-          array('v' => (float) $r['Temperature'])
-        )));
-
-      }
-
-      // convert data into JSON format
-      $jsonTable = json_encode($table);
-
-      return $jsonTable;
+      return $table;
 
     } catch (Exception $e) {
       $logger->error("DB Error - " . $this->lastErrorMsg());
     }
   }
+  
 }
 
-$node = new Node();
-$nodes = $node->getNodeTables();
-//var_dump($nodes);
-echo($nodes[0]->getLastN(600));
+$nodes = new Nodes();
+
+echo($nodes->getNodes(600));
 
 /*
 //performance test

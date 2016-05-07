@@ -1,0 +1,30 @@
+.centered {
+    text-align: center;
+    /*font-size: 0;*/
+}
+.centered > div {
+    float: none;
+    display: inline-block;
+    text-align: left;
+    /*font-size: 13px;*/
+}
+.st-dot-parent {
+  position: relative;
+}
+.st-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+	background: linear-gradient(to bottom, #40b3ff, #09f);
+  border-radius: 50%;
+	width: 12px;
+	height: 12px;
+}
+.link-panel:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+.hideable {
+  display: none;
+}

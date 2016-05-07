@@ -1,4 +1,4 @@
-from time import time
+from time import time, sleep
 from threading import Thread
 import logging
 import requests
@@ -21,7 +21,7 @@ class Http_Client(object):
         Http_Client.nid = nid
         Http_Client.source = source
 
-        Http_Client._queue = queue.Queue(maxsize=1)
+        Http_Client._queue = queue.Queue(maxsize=3)
         Http_Client.thread = Thread(target=Http_Client.__query)
         Http_Client.thread.daemon = True
         Http_Client.thread.start()
@@ -45,6 +45,13 @@ class Http_Client(object):
                     logging.info('Req: %s %s', r.status_code, r.reason)
                 else:
                     logging.warning('Req: %s %s', r.status_code, r.reason)
+
+            except requests.exceptions.ConnectionError:
+                logging.warning('Reconnecting... - Connection Error')
+                Http_Client.source.reconnect_umts()
+                sleep(45)
+                Http_Client._queue.put_nowait(payload)
+
             except requests.exceptions.RequestException as er:
                 logging.warning('Requests Exception: %s', er)
             Http_Client._queue.task_done()

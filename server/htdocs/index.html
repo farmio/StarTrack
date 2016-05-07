@@ -1,50 +1,41 @@
 <html>
   <head>
-    <!--Load the AJAX API-->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript">
-
-    // Load the Visualization API and the linechart package.
-    google.charts.load('current', {'packages':['corechart'], 'language': 'de'});
-
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-      var jsonData = $.ajax({
-          url: "get.php",
-          dataType: "json",
-          async: false
-          }).responseText;
-
-      // Create our data table out of JSON data loaded from server.
-      var data = new google.visualization.DataTable(jsonData);
-
-      var options = {
-          chart: {
-            title: 'Temp by Time',
-            subtitle: 'in °C'
-          },
-          width: 900,
-          height: 500,
-          axes: {
-            x: {
-              0: {side: 'top'}
-            }
-          }
-        };
-
-      var chart = new google.visualization.LineChart(document.getElementById('line_top_x'));
-
-      chart.draw(data, options);
-    }
-
-    </script>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
+    <link rel="stylesheet" href="css/startrack.css">
+    <!--
+    jquery.js
+    <script src="js/d3.min.js"></script>
+    <script src="js/nv.d3.min.js"></script>
+    <link href="css/nv.d3.css" rel="stylesheet">
+    -->
   </head>
-
   <body>
-    <!--Div that will hold the pie chart-->
-    <div id="line_top_x"></div>
+    <a href="https://github.com/farmio/startrack"><img style="position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px;" src="img/right-dusk-blue@2x.png" alt="Fork me on GitHub"></a>
+    <div class="container">
+      <div class="page-header">
+        <h1>StarTrack <small>field irrigation monitoring</small></h1>
+      </div>
+      <h3>Latest Status</h3>
+      <div class="row">
+        <div class="col-xs-12">
+          <p id="info-container"></p>
+        </div>
+      </div>
+      <!-- <div id="panel-row" class="row centered"> -->
+      <div id="panel-row" class="row"></div>
+      <div class="row">
+        <div id="chart" class="col-xs-12" style='height: 400px'>
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
   </body>
+  <script src="js/startrack.js"></script>
+
 </html>

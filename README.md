@@ -5,7 +5,7 @@ monitor old Rainstars
 
 ##Disclaimer
 
-This is my very first Python project and my first project with git.
+This is my very first programming project and my first steps with git.
 I'm trying to advance in both as this project progresses.
 
 
@@ -21,15 +21,19 @@ Software
 - [x] measure the current retraction speed
   - [x] calculate the remaining irrigation time
   - [ ] calculate water/area at current speed
-- [ ] communicate over 3G
+- [x] communicate over 3G
   - [ ] alert when retraction is finished / has stopped
-  - [ ] post status to a server (every half hour ?)
-- [ ] possibility for setting remaining length manually
+  - [x] post status to a server
+- [x] possibility for setting remaining length manually
+- [ ] web interface for (live) monitoring over external server
+  - [x] show chart with speed over time for all machines
+  - [ ] push live status to webclients (over websocket)
+  - [ ] stop or regulate machines remotely via web interface
 
 Hardware
 
 - [ ] load battery
-  - [ ] with photovoltaic cell
+  - [x] with photovoltaic cell
   - [ ] with generator driven by water from the piston drive
 - [ ] regulate retraction speed
 
@@ -45,7 +49,7 @@ My hardware:
 - 1x 3G Stick Huawei E156G
 
 
-##Dependencies
+##Node Dependencies
 
 ###Operating system
 
@@ -73,6 +77,16 @@ For 3G connectivity:
 - adnpy (Python 2 only)
 - config
 - PyJWT
+
+
+##Server Dependencies
+
+- Webserver of your choice
+- PHP 5.?
+- Sqlite3
+- composer https://getcomposer.org
+- ZeroMQ for WebSocket: http://zeromq.org
+
 
 
 ##Licence

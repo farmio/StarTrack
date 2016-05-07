@@ -3,12 +3,13 @@ require '../vendor/autoload.php';
 use \Firebase\JWT\JWT;
 
 $config = require '../config.php';
-$dbPath = '../data/node_data.sqlite'
+$dbPath = '../data/node_data.sqlite';
 
 $logger = new Katzgrau\KLogger\Logger('../log/');
 
+date_default_timezone_set('UTC');
 
-if( $_POST['jwt'] ){
+if( isset($_POST['jwt']) ){
 
   try {
 
@@ -33,6 +34,7 @@ function readToken($claims) {
   switch($claims->act) {
     case "push":
       dbPush($claims);
+      webSocketPush($claims);
       break;
     case "start":
       dbReset($claims->nid);
@@ -48,9 +50,12 @@ function readToken($claims) {
 
 function dbPush($data) {
 
+  global $logger;
+  global $dbPath;
+
   try {
 
-    $dbh = new SQLite3(global $dbPath);
+    $dbh = new SQLite3($dbPath);
 
     //create new Table if it doesn't exist
     $query = "CREATE TABLE IF NOT EXISTS node_{$data->nid} (
@@ -66,7 +71,7 @@ function dbPush($data) {
                 bat NUMERIC,
                 wsp NUMERIC,
                 sli NUMERIC,
-                mws NUMERIC,
+                mws NUMERIC
               );";
     #$dbh->exec($query);
 
@@ -74,18 +79,18 @@ function dbPush($data) {
 
     $query .= "INSERT INTO node_{$data->nid}
                 (rot, spd, row, lay, rdm, eta, tmp, bat, wsp, sli, mws)
-                VALUES ($data->rot,
-                        $data->spd,
-                        $data->row,
-                        $data->lay,
-                        $data->rdm,
-                        $data->eta,
-                        $data->tmp,
-                        $data->bat,
-                        $data->wsp,
-                        $data->sli,
-                        $data->mws,
-                        );";
+                VALUES ({$data->rot},
+                        {$data->spd},
+                        {$data->row},
+                        {$data->lay},
+                        {$data->rdm},
+                        {$data->eta},
+                        {$data->tmp},
+                        {$data->bat},
+                        {$data->wsp},
+                        {$data->sli},
+                        {$data->mws}
+                      );";
     $dbh->exec($query);
 
     http_response_code(201);
@@ -104,10 +109,12 @@ function dbPush($data) {
 }
 
 function dbReset($nid) {
+  global $logger;
+  global $dbPath;
 
   try {
 
-    $dbh = new SQLite3(global $dbPath);
+    $dbh = new SQLite3($dbPath);
 
     $query = "DROP TABLE IF EXISTS node_{$nid};
               VACUUM;";
@@ -124,6 +131,42 @@ function dbReset($nid) {
   } finally {
 
     $dbh->close();
+
+  }
+
+}
+
+function webSocketPush($data) {
+  global $logger;
+
+  try {
+
+    $message = [];
+    $message['nid'] = (int) $data->nid;
+    $message['cap'] = "Node {$data->nid}";
+    // 'time' and 'id' are created by the database - we just need 'time'
+    $message['recent'] = ['time' => date('Y-m-d H:i:s', time())
+                          ,'rot' => (int) $data->rot
+                          ,'spd' => (float) $data->spd
+                          ,'row' => (int) $data->row
+                          ,'lay' => (int) $data->lay
+                          ,'rdm' => (int) $data->rdm
+                          ,'eta' => (int) $data->eta
+                          ,'tmp' => (float) $data->tmp
+                          ,'bat' => (int) $data->bat
+                          ,'wsp' => (int) $data->wsp
+                          ,'sli' => (int) $data->sli
+                          ,'mws' => (int) $data->mws];
+
+    $context = new ZMQContext();
+    $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'st_pusher');
+    $socket->connect("tcp://localhost:5555");
+
+    $socket->send(json_encode($message));
+
+  } catch (Exception $e) {
+
+    $logger->error("Push Error - " . $e);
 
   }
 
