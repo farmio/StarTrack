@@ -45,11 +45,13 @@ class Http_Client(object):
                     logging.info('Req: %s %s', r.status_code, r.reason)
                 else:
                     logging.warning('Req: %s %s', r.status_code, r.reason)
+
             except requests.exceptions.ConnectionError:
                 logging.warning('Reconnecting... - Connection Error')
                 Http_Client.source.reconnect_umts()
                 sleep(45)
                 Http_Client._queue.put_nowait(payload)
+
             except requests.exceptions.RequestException as er:
                 logging.warning('Requests Exception: %s', er)
             Http_Client._queue.task_done()

@@ -49,6 +49,7 @@ function readToken($claims) {
 
 
 function dbPush($data) {
+
   global $logger;
   global $dbPath;
 
@@ -168,6 +169,7 @@ function webSocketPush($data) {
     $logger->error("Push Error - " . $e);
 
   }
+
 }
 
 ?>
